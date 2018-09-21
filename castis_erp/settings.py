@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
@@ -103,7 +104,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ko-kr'
 
 TIME_ZONE = 'Asia/Seoul'
 
@@ -122,3 +123,13 @@ STATICFILES_DIRS = [ os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/' # 반드시 / 로 끝나야 함
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+LOGIN_URL = '/accounts/login/' # 기본값
+LOGOUT_URL = '/accounts/logout/' # 기본값
+LOGIN_REDIRECT_URL = '/' # 반드시 정의할 것!
+
+# logout 에는 별도의 view 를 사용하지 않는다.
+# logout 이 후 / 로 이동하면, login 이 안되어 있기 때문에 LOGIN_URL 로 다시 redirec 된다.
+LOGOUT_REDIRECT_URL = '/'
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
