@@ -21,7 +21,7 @@ class UserListByGroup(ListView):
         for group in Group.objects.filter(user=self.request.user):
             group_dict = {}
             group_dict['name'] = group.name
-            group_dict['users'] = User.objects.filter(groups__name__exact=group.name)
+            group_dict['users'] = User.objects.filter(groups__name__exact=group.name).exclude(id=self.request.user.id)
             groups.append(group_dict)
 
         context['groups'] = groups
