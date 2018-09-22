@@ -50,6 +50,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+if DEBUG:
+    INSTALLED_APPS += [
+        'django_extensions',
+    ]
+
+
 ROOT_URLCONF = 'castis_erp.urls'
 
 TEMPLATES = [

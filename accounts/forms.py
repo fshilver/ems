@@ -1,8 +1,8 @@
 from django import forms
-from django.contrib.auth.forms import ReadOnlyPasswordHashField, AuthenticationForm, UserChangeForm, UserCreationForm
+from django.contrib.auth.forms import UserChangeForm
 from django.utils.translation import ugettext_lazy as _
-
-from .models import CustomUser, CustomUserManager
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 
 
 class CustomUserCreationForm(forms.ModelForm):
@@ -11,8 +11,8 @@ class CustomUserCreationForm(forms.ModelForm):
     password2 = forms.CharField(label='Password Confirm', widget=forms.PasswordInput)
 
     class Meta:
-        model = CustomUser
-        fields = ('email', 'name')
+        model = get_user_model()
+        fields = ('email', 'name', 'is_active', 'is_staff')
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -32,5 +32,61 @@ class CustomUserCreationForm(forms.ModelForm):
 class CustomUserChangeForm(UserChangeForm):
 
     class Meta:
-        model = CustomUser
+        model = get_user_model()
         fields = ('email', 'name', 'is_active', 'is_superuser', 'is_staff')
+
+
+class SigninForm(forms.ModelForm):
+
+    groups = forms.ModelMultipleChoiceField(
+        queryset=Group.objects.all(),
+        required=True,
+        widget=forms.SelectMultiple(attrs={'class': 'select2_multiple form-control'}),
+    )
+    password1 = forms.CharField(
+        label='Password',
+        widget=forms.PasswordInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+        strip=False,
+    )
+    password2 = forms.CharField(
+        label='Password Confirmation',
+        widget=forms.PasswordInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+        strip=False,
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = ('email', 'name', 'is_active', 'is_staff', 'groups')
+        labels = {
+            'email': 'Email',
+            'name': 'Name',
+            'is_active': '활성화 여부',
+            'is_staff': '팀 관리자 여부',
+            'groups': '소속 사업부',
+        }
+        widgets = {
+            'email': forms.EmailInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+            'name': forms.TextInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'flat'}),
+            'is_staff': forms.CheckboxInput(attrs={'class': 'flat'}),
+        }
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Passwords don't match")
+        return password2
+
+    def form_valid(self, form):
+        self.object.groups.clear()
+        self.object.groups.add(form.cleaned_data['groups'])
+
+    def save(self, commit=True):
+        user = super(SigninForm, self).save(commit=False)
+
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+            user.groups.add(*self.cleaned_data['groups']) # groups 는 list 이기 때문에 *self 로 사용
+        return user

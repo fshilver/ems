@@ -1,12 +1,11 @@
-from django.shortcuts import render
-from django.views.generic import TemplateView, ListView
-from django.contrib.auth.views import LoginView
+from django.views.generic import ListView, CreateView
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
-from itertools import chain
+from django.urls import reverse_lazy
+from .forms import SigninForm
 
 
-class UserListByGroup(ListView):
+class UserListByGroupView(ListView):
 
     template_name = "accounts/group_user_list.html"
     context_object_name = 'allUsers'
@@ -26,3 +25,10 @@ class UserListByGroup(ListView):
 
         context['groups'] = groups
         return context
+
+class UserSignUpView(CreateView):
+    model = get_user_model()
+    #fields = ('email', 'name', 'password', 'is_active', 'is_staff')
+    form_class = SigninForm
+    template_name = "accounts/user_create.html"
+    success_url = reverse_lazy('accounts:users_by_group')
