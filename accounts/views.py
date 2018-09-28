@@ -1,4 +1,4 @@
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, DeleteView, UpdateView
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
@@ -32,3 +32,33 @@ class UserSignUpView(CreateView):
     form_class = SigninForm
     template_name = "accounts/user_create.html"
     success_url = reverse_lazy('accounts:users_by_group')
+
+
+class GroupListView(ListView):
+    model = Group
+    template_name = "accounts/group_list.html"
+
+
+class GroupCreateView(CreateView):
+    model = Group
+    template_name = "accounts/group_create.html"
+    success_url = reverse_lazy('accounts:group_list')
+    fields = ('name',)
+
+    def get_context_data(self, **kwargs):
+        cx = super().get_context_data(**kwargs)
+        print(cx)
+        return cx
+
+
+class GroupDeleteView(DeleteView):
+    model = Group
+    template_name = "accounts/group_delete.html"
+    success_url = reverse_lazy('accounts:group_list')
+
+
+class GroupUpdateView(UpdateView):
+    model = Group
+    fields = ('name',)
+    template_name = "accounts/group_create.html"
+    success_url = reverse_lazy('accounts:group_list')

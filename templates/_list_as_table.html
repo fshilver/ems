@@ -1,20 +1,19 @@
 {% extends "__base.html" %}
 
-{% block title %} 구성원 목록 {% endblock title %}
-
-{% block stylesheets %}
-  {{ block.super }}
-{% endblock stylesheets %}
-
 {% block content %}
   <div class="right_col" role="main">
     <div class="">
       <div class="page-title">
         <div class="title_left">
-          <h3>구성원 <small>목록</small></h3>
+
+          {% block page_title %}
+          <h3>Page Title</h3>
+          {% endblock page_title %}
+
         </div>
 
         <div class="title_right">
+          {% block top_right_button %}
           <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
             <div class="input-group">
               <input type="text" class="form-control" placeholder="Search for...">
@@ -23,12 +22,12 @@
               </span>
             </div>
           </div>
+          {% endblock top_right_button %}
         </div>
       </div>
 
       <div class="clearfix"></div>
 
-      {% for group in groups %}
       <div class="row">
 
         <!-- table -->
@@ -38,29 +37,19 @@
 
             <!-- table title -->
             <div class="x_title">
-              <h2>{{ group.name }}</h2>
-              <ul class="nav navbar-right panel_toolbox">
-                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                </li>
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                  <ul class="dropdown-menu" role="menu">
-                    <li><a href="#">Settings 1</a>
-                    </li>
-                    <li><a href="#">Settings 2</a>
-                    </li>
-                  </ul>
-                </li>
-                <li><a class="close-link"><i class="fa fa-close"></i></a>
-                </li>
-              </ul>
-              <div class="clearfix"></div>
+
+              {% block table_title %}
+              <h2>Table title</h2>
+              {% endblock table_title %}
+
             </div>
 
             <!-- table content -->
             <div class="x_content">
               <!-- <p>Add class <code>bulk_action</code> to table for bulk actions options on row select</p> -->
               <div class="table-responsive">
+
+                {% block table_content %}
                 <table class="table table-striped jambo_table bulk_action">
                   <thead>
                     <tr class="headings">
@@ -73,33 +62,26 @@
                   </thead>
 
                   <tbody>
-                  {% for user in group.users %}
                   
                     <tr class="{% cycle 'even' 'odd' %} pointer">
                       <td class="a-center "><input type="checkbox" class="flat" name="table_records"></td>
-                      <td class=" ">{{ user.email }}</td>
-                      <td class=" ">{{ user.name }} </td>
-                      <td class=" ">{{ user.created_at|date:"Y-m-d"}}</td>
+                      <td class=" ">honggildong@castis.com</td>
+                      <td class=" ">홍길동</td>
+                      <td class=" ">2018-10-01</td>
                     </tr>
 
-                  {% endfor %}
                   </tbody>
 
                 </table>
+                {% endblock table_content %}
+
               </div>
             </div>
 
           </div>
         </div>
       </div>
-      {% endfor %}
+
     </div>
   </div>
 {% endblock content %}
-
-{% block javascripts %}
-  {{ block.super }}
-{% endblock javascripts %}
-
-
-

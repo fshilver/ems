@@ -39,6 +39,7 @@ class CustomUserChangeForm(UserChangeForm):
 class SigninForm(forms.ModelForm):
 
     groups = forms.ModelMultipleChoiceField(
+        label='소속 사업부',
         queryset=Group.objects.all(),
         required=True,
         widget=forms.SelectMultiple(attrs={'class': 'select2_multiple form-control'}),
@@ -62,7 +63,6 @@ class SigninForm(forms.ModelForm):
             'name': 'Name',
             'is_active': '활성화 여부',
             'is_staff': '팀 관리자 여부',
-            'groups': '소속 사업부',
         }
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
