@@ -1,0 +1,47 @@
+{% extends "_list_as_table.html" %}
+
+{% block title %}
+Group List
+{% endblock title %}
+
+
+{% block page_title %}
+<h3>Group List</h3>
+{% endblock page_title %}
+
+{% block top_right_button %}
+{% comment %} <div class="col-md-2 col-sm-2 col-xs-12 form-group pull-right top_search"> {% endcomment %}
+<div class="form-group pull-right top_search">
+    <a class="btn btn-success" href="{% url 'accounts:group_create' %}">그룹 추가</a>
+</div>
+{% endblock top_right_button %}
+
+{% block table_title %}
+{% endblock table_title %}
+
+
+{% block table_content %}
+<table class="table table-striped jambo_table">
+    <thead>
+    <tr class="headings">
+        <th class="column-title">ID</th>
+        <th class="column-title">이름</th>
+        <th class="column-title" style="width:10%;">Change</th>
+        <th class="column-title" style="width:10%;">Delete</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for group in object_list %}
+    
+    <tr class="{% cycle 'even' 'odd' %} pointer">
+        <td>{{ group.id }}</a></td>
+        <td>{{ group.name }} </td>
+        <td><a class="btn btn-success btn-xs" href="{% url 'accounts:group_update' group.id %}">수정</a></td>
+        <td><a class="btn btn-success btn-xs" href="{% url 'accounts:group_delete' group.id %}">삭제</a></td>
+    </tr>
+
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock table_content %}
