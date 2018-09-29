@@ -1,0 +1,36 @@
+{% extends "_form.html" %}
+
+{% block title %}
+수리 상태 Label 생성
+{% endblock title %}
+
+
+{% block page_title %}
+<h3>수리 상태 Label 생성</h3>
+{% endblock page_title %}
+
+
+{% block form_block %}
+<form method="POST" class="form-horizontal form-label-left">{% csrf_token %}
+
+    <div class="form-group">
+        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.label.name }}">
+        {{ form.label.label }} <span class="required">(*)</span>
+        </label>
+        <div class="col-md-6 col-sm-6 col-xs-12">
+        {{ form.label }}
+        </div>
+    </div>
+
+
+    <div class="ln_solid"></div>
+
+    <div class="form-group">
+        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+        <button class="btn btn-primary" type="button">취소</button>
+        <button type="submit" class="btn btn-success">생성</button>
+        </div>
+    </div>
+
+</form>
+{% endblock form_block %}

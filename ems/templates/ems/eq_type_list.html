@@ -1,0 +1,47 @@
+{% extends "_list_as_table.html" %}
+
+{% block title %}
+장비 타입 Label 목록
+{% endblock title %}
+
+
+{% block page_title %}
+<h3>장비 타입 Label 목록</h3>
+{% endblock page_title %}
+
+{% block top_right_button %}
+{% comment %} <div class="col-md-2 col-sm-2 col-xs-12 form-group pull-right top_search"> {% endcomment %}
+<div class="form-group pull-right top_search">
+    <a class="btn btn-success" href="{% url 'ems:eq_type_create' %}">장비 타입 Label 추가</a>
+</div>
+{% endblock top_right_button %}
+
+{% block table_title %}
+{% endblock table_title %}
+
+
+{% block table_content %}
+<table class="table table-striped jambo_table">
+    <thead>
+    <tr class="headings">
+        <th class="column-title">ID</th>
+        <th class="column-title">장비 타입 Label</th>
+        <th class="column-title" style="width:10%;">수정</th>
+        <th class="column-title" style="width:10%;">삭제</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for obj in object_list %}
+    
+    <tr class="{% cycle 'even' 'odd' %} pointer">
+        <td>{{ obj.id }}</a></td>
+        <td>{{ obj.label }} </td>
+        <td><a class="btn btn-success btn-xs" href="{% url 'ems:eq_type_update' obj.id %}">수정</a></td>
+        <td><a class="btn btn-success btn-xs" href="{% url 'ems:eq_type_delete' obj.id %}">삭제</a></td>
+    </tr>
+
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock table_content %}
