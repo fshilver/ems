@@ -89,8 +89,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['name', ]
     objects = CustomUserManager()
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
-        return self.email
+        return self.name
 
     def get_full_name(self):
         return self.name
