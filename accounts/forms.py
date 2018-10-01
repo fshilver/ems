@@ -76,7 +76,10 @@ class SigninForm(forms.ModelForm):
     def __init__(self, user=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if user:
-            self.fields['groups'].queryset = Group.objects.filter(user=user)
+            if user.is_superuser:
+                self.fields['groups'].queryset = Group.objects.all()
+            else:
+                self.fields['groups'].queryset = Group.objects.filter(user=user)
         else:
             self.fields['groups'].queryset = Group.objects.all()
 

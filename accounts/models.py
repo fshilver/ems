@@ -95,6 +95,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.name
 
+    @property
+    def group_names(self):
+        return ','.join([g.name for g in self.groups.all()]) if self.groups.count() else ''
+        
+
     def get_full_name(self):
         return self.name
 

@@ -1,0 +1,10 @@
+{% extends "_common_delete.html" %}
+
+{% block title %}
+사용자 삭제
+{% endblock title %}
+
+
+{% block cancel_link %}
+    {% url 'accounts:user_list' %}
+{% endblock cancel_link %}

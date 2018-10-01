@@ -22,7 +22,7 @@
 
         <li><a><i class="fa fa-cogs"></i> 관리자 설정 <span class="fa fa-chevron-down"></span></a>
           <ul class="nav child_menu">
-            <li><a href="#">사용자 등록</a></li>
+            <li><a href="{% url 'accounts:user_list' %}">사용자 관리</a></li>
             <li><a href="#">장비 관리<span class="fa fa-chevron-down"></span></a>
               <ul class="nav child_menu">
                 <li><a href="{% url 'ems:repair_status_list' %}">수리 상태 Label</a></li>
@@ -38,7 +38,7 @@
 
         {% if user.is_staff %}
 
-        <li><a><i class="fa fa-cogs"></i> 구성원 관리 <span class="fa fa-chevron-down"></span></a>
+        <li><a><i class="fa fa-cogs"></i> 팀 구성원 관리 <span class="fa fa-chevron-down"></span></a>
           <ul class="nav child_menu">
             <li><a href="{% url 'accounts:signup' %}">구성원 추가 </a></li>
             <li><a href="{% url 'accounts:users_by_group' %}">구성원 정보 </a></li>
