@@ -33,6 +33,11 @@ class UserSignUpView(CreateView):
     template_name = "accounts/user_form.html"
     success_url = reverse_lazy('accounts:users_by_group')
 
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super().get_form_kwargs(*args, **kwargs)
+        form_kwargs['user'] = self.request.user
+        return form_kwargs
+
 
 class GroupListView(ListView):
     model = Group

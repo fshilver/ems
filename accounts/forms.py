@@ -42,7 +42,7 @@ class SigninForm(forms.ModelForm):
 
     groups = forms.ModelMultipleChoiceField(
         label='소속 사업부',
-        queryset=Group.objects.all(),
+        queryset=None,
         required=True,
         widget=forms.SelectMultiple(attrs={'class': 'select2_multiple form-control'}),
     )
@@ -72,6 +72,14 @@ class SigninForm(forms.ModelForm):
             'is_active': forms.CheckboxInput(attrs={'class': 'flat'}),
             'is_staff': forms.CheckboxInput(attrs={'class': 'flat'}),
         }
+
+    def __init__(self, user=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['groups'].queryset = Group.objects.filter(user=user)
+        else:
+            self.fields['groups'].queryset = Group.objects.all()
+
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
