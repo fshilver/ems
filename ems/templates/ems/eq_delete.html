@@ -1,23 +1,10 @@
-{% extends "_form.html" %}
+{% extends "_common_delete.html" %}
 
 {% block title %}
 장비 삭제
 {% endblock title %}
 
-{% block page_title %}
-<h3>장비 삭제</h3>
-{% endblock page_title %}
 
-{% block form_block %}
-정말 "{{ object }}" 을/를 삭제하시겠습니까?
-<form method="POST" class="form-horizontal form-label-left">{% csrf_token %}
-
-    <div class="form-group">
-        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-        <a class="btn btn-primary" href="{% url 'ems:eq_list' %}">취소</a>
-        <button type="submit" class="btn btn-danger">삭제</button>
-        </div>
-    </div>
-
-</form>
-{% endblock form_block %}
+{% block cancel_link %}
+    {% url 'ems:eq_list' %}
+{% endblock cancel_link %}
