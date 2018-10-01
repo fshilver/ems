@@ -6,9 +6,13 @@
       <div class="page-title">
         <div class="title_left">
 
+          <h3>
           {% block page_title %}
-          <h3>Page Title</h3>
+            {% block title %}
+              {{ block.super }}
+            {% endblock title %}
           {% endblock page_title %}
+          </h3>
 
         </div>
 

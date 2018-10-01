@@ -5,11 +5,6 @@
 {% endblock title %}
 
 
-{% block page_title %}
-{% if object %}그룹 수정{% else %}그룹 생성{% endif %}
-{% endblock page_title %}
-
-
 {% block form_block %}
 <form method="POST" class="form-horizontal form-label-left">{% csrf_token %}
 
