@@ -38,6 +38,8 @@ class CustomUserChangeForm(UserChangeForm):
 
 class SigninForm(forms.ModelForm):
 
+    field_order = ('email', 'name', 'password1', 'password2', 'is_active', 'is_staff', 'groups')
+
     groups = forms.ModelMultipleChoiceField(
         label='소속 사업부',
         queryset=Group.objects.all(),

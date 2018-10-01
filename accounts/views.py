@@ -30,7 +30,7 @@ class UserSignUpView(CreateView):
     model = get_user_model()
     #fields = ('email', 'name', 'password', 'is_active', 'is_staff')
     form_class = SigninForm
-    template_name = "accounts/user_create.html"
+    template_name = "accounts/user_form.html"
     success_url = reverse_lazy('accounts:users_by_group')
 
 
