@@ -41,7 +41,7 @@ class GroupListView(ListView):
 
 class GroupCreateView(CreateView):
     model = Group
-    template_name = "accounts/group_create.html"
+    template_name = "accounts/group_form.html"
     success_url = reverse_lazy('accounts:group_list')
     fields = ('name',)
 
@@ -60,5 +60,5 @@ class GroupDeleteView(DeleteView):
 class GroupUpdateView(UpdateView):
     model = Group
     fields = ('name',)
-    template_name = "accounts/group_create.html"
+    template_name = "accounts/group_form.html"
     success_url = reverse_lazy('accounts:group_list')

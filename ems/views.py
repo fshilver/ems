@@ -23,14 +23,14 @@ class RepairStatusListView(ListView):
 
 class RepairStatusCreateView(CreateView):
     model = RepairStatus
-    template_name = 'ems/repair_status_create.html'
+    template_name = 'ems/repair_status_form.html'
     success_url = reverse_lazy('ems:repair_status_list')
     fields = ('label',)
 
 
 class RepairStatusUpdateView(UpdateView):
     model = RepairStatus
-    template_name = 'ems/repair_status_update.html'
+    template_name = 'ems/repair_status_form.html'
     success_url = reverse_lazy('ems:repair_status_list')
     fields = ('label',)
 
@@ -51,14 +51,14 @@ class EquipmentTypeListView(ListView):
 
 class EquipmentTypeCreateView(CreateView):
     model = EquipmentType
-    template_name = 'ems/eq_type_create.html'
+    template_name = 'ems/eq_type_form.html'
     success_url = reverse_lazy('ems:eq_type_list')
     fields = ('label',)
 
 
 class EquipmentTypeUpdateView(UpdateView):
     model = EquipmentType
-    template_name = 'ems/eq_type_update.html'
+    template_name = 'ems/eq_type_form.html'
     success_url = reverse_lazy('ems:eq_type_list')
     fields = ('label',)
 

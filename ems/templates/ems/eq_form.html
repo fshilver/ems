@@ -1,12 +1,12 @@
 {% extends "_form.html" %}
 
 {% block title %}
-장비 생성
+장비 {% if object %}수정{% else %}생성{% endif %}
 {% endblock title %}
 
 
 {% block page_title %}
-<h3>장비 생성</h3>
+<h3>장비 {% if object %}수정{% else %}생성{% endif %}</h3>
 {% endblock page_title %}
 
 
@@ -49,7 +49,11 @@
     <div class="form-group">
         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-4">
         <a class="btn btn-primary" href="{% url 'ems:eq_list' %}">취소</a>
+        {% if object %}
+        <button type="submit" class="btn btn-success">변경</button>
+        {% else %}
         <button type="submit" class="btn btn-success">생성</button>
+        {% endif %}
         </div>
     </div>
 
