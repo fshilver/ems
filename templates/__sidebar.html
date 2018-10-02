@@ -49,8 +49,10 @@
 
         <li><a><i class="fa fa-desktop"></i> 사내 장비 관리 <span class="fa fa-chevron-down"></span></a>
           <ul class="nav child_menu">
-            <li><a href="#">장비 신청하기</a></li>
-            <li><a href="#">사용중인 장비 목록</a></li>
+            <li><a href="{% url 'ems:usable_eq_list' %}">장비 사용 신청하기</a></li>
+            <li><a href="{% url 'ems:used_eq_list' %}">사용 중인 장비 목록</a></li>
+            <li><a href="{% url 'ems:apply_eq_list' %}">사용 신청한 장비 목록</a></li>
+            <li><a href="{% url 'ems:return_eq_list' %}">반납 신청한 장비 목록</a></li>
           </ul>
         </li>
 

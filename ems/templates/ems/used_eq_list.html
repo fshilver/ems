@@ -1,0 +1,40 @@
+{% extends "_list_as_table.html" %}
+
+{% block title %}
+사용 중인 장비 목록
+{% endblock title %}
+
+
+
+{% block table_title %}
+{% endblock table_title %}
+
+
+{% block table_content %}
+<table class="table table-striped jambo_table">
+    <thead>
+    <tr class="headings">
+        <th class="column-title">ID</th>
+        <th class="column-title">S/N</th>
+        <th class="column-title">구입 날짜</th>
+        <th class="column-title">상세Spec</th>
+        <th class="column-title" style="width:10%;">반납신청</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for obj in object_list %}
+    
+    <tr class="{% cycle 'even' 'odd' %} pointer">
+        <td>{{ obj.id }}</a></td>
+        <td>{{ obj.serial_number }} </td>
+        <td>{{ obj.purchase_date }} </td>
+        <td><a class="btn btn-default btn-xs" href="{% url 'ems:eq_spec_detail' obj.id %}">자세히</a></td>
+        <td><a class="btn btn-success btn-xs" href="{% url 'ems:return_eq' obj.id %}">반납신청</a></td>
+    </tr>
+
+
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock table_content %}

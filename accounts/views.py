@@ -89,7 +89,6 @@ class GroupCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         cx = super().get_context_data(**kwargs)
-        print(cx)
         return cx
 
 

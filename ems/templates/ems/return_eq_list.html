@@ -1,0 +1,71 @@
+{% extends "_list_as_table.html" %}
+
+{% block title %}
+반납 신청 중인 장비 목록
+{% endblock title %}
+
+
+
+{% block table_title %}
+{% endblock table_title %}
+
+
+{% block table_content %}
+<table class="table table-striped jambo_table">
+    <thead>
+        {% if user.is_superuser %}
+
+            <tr class="headings">
+                <th class="column-title">ID</th>
+                <th class="column-title">S/N</th>
+                <th class="column-title">신청한 사람</th>
+                <th class="column-title">구입 날짜</th>
+                <th class="column-title">상세Spec</th>
+                <th class="column-title" style="width:10%;">승인</th>
+                <th class="column-title" style="width:10%;">반송</th>
+            </tr>
+        
+        {% else %}
+
+            <tr class="headings">
+                <th class="column-title">ID</th>
+                <th class="column-title">S/N</th>
+                <th class="column-title">구입 날짜</th>
+                <th class="column-title">상세Spec</th>
+                <th class="column-title" style="width:10%;">반납신청취소</th>
+            </tr>
+
+        {% endif %}
+    </thead>
+
+    <tbody>
+    {% for obj in object_list %}
+    
+        {% if user.is_superuser %}
+
+            <tr class="{% cycle 'even' 'odd' %} pointer">
+                <td>{{ obj.id }}</a></td>
+                <td>{{ obj.serial_number }} </td>
+                <td>{{ obj.current_user }} </td>
+                <td>{{ obj.purchase_date }} </td>
+                <td><a class="btn btn-default btn-xs" href="{% url 'ems:eq_spec_detail' obj.id %}">자세히</a></td>
+                <td><a class="btn btn-success btn-xs" href="{% url 'ems:return_eq_accept' obj.id %}">승인</a></td>
+                <td><a class="btn btn-success btn-xs" href="{% url 'ems:return_eq_reject' obj.id %}">반송</a></td>
+            </tr>
+
+        {% else %}
+
+            <tr class="{% cycle 'even' 'odd' %} pointer">
+                <td>{{ obj.id }}</a></td>
+                <td>{{ obj.serial_number }} </td>
+                <td>{{ obj.purchase_date }} </td>
+                <td><a class="btn btn-default btn-xs" href="{% url 'ems:eq_spec_detail' obj.id %}">자세히</a></td>
+                <td><a class="btn btn-success btn-xs" href="{% url 'ems:return_eq_reject' obj.id %}">신청취소</a></td>
+            </tr>
+
+        {% endif %}
+
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock table_content %}

@@ -1,0 +1,50 @@
+{% extends "_list_as_table.html" %}
+
+{% block title %}
+장비 Spec
+{% endblock title %}
+
+
+
+{% block table_title %}
+{% endblock table_title %}
+
+
+{% block table_content %}
+<table class="table table-striped">
+    <thead>
+    <tr class="headings">
+        <th class="column-title">항목</th>
+        <th class="column-title">사양</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+    <tr class="even pointer">
+        <th scope="row">CPU</th><td>{{ object.cpu }} </td>
+    </tr>
+    <tr class="odd pointer">
+        <th scope="row">메모리</th><td>{{ object.mem }} </td>
+    </tr>
+    <tr class="even pointer">
+        <th scope="row">HDD</th><td>{{ object.hdd }} </td>
+    </tr>
+    <tr class="odd pointer">
+        <th scope="row">NIC</th><td>{{ object.nic }} </td>
+    </tr>
+    <tr class="even pointer">
+        <th scope="row">그래픽카드</th><td>{{ object.graphic }} </td>
+    </tr>
+    <tr class="odd pointer">
+        <th scope="row">제조사</th><td>{{ object.manufacturer }} </td>
+    </tr>
+
+    </tbody>
+</table>
+{% endblock table_content %}
+
+
+{% block panel_footer %}
+<a class="btn btn-success btn-block" href="{% url 'ems:usable_eq_list' %}">뒤로가기</a>
+{% endblock panel_footer %}
