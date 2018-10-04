@@ -47,3 +47,4 @@ class CustomUserAdmin(BaseUserAdmin):
     )
 
     ordering = ('email',)
+    search_fields = ('email', 'name')
