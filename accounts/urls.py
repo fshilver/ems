@@ -7,10 +7,13 @@ from .views import (
     UserCreateView,
     UserUpdateView,
     UserDeleteView,
+    CustomLoginView,
 )
 from .views import GroupListView, GroupCreateView, GroupDeleteView, GroupUpdateView
 
 urlpatterns = [
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('users/', UserListView.as_view(), name='user_list'),
     path('users/create/', UserCreateView.as_view(), name='user_create'),
     path('users/update/<int:pk>/', UserUpdateView.as_view(), name='user_update'),

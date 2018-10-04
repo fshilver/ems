@@ -2,7 +2,12 @@ from django.views.generic import ListView, CreateView, DeleteView, UpdateView
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
-from .forms import SigninForm
+from .forms import SigninForm, LoginForm
+from django.contrib.auth.views import LoginView
+
+class CustomLoginView(LoginView):
+    authentication_form = LoginForm
+    template_name = 'accounts/login.html'
 
 
 class UserListByGroupView(ListView):

@@ -1,8 +1,9 @@
 from django import forms
-from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth.forms import UserChangeForm, AuthenticationForm
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.contrib.auth.forms import UsernameField
 
 
 class CustomUserCreationForm(forms.ModelForm):
@@ -103,3 +104,33 @@ class SigninForm(forms.ModelForm):
             user.save()
             user.groups.add(*self.cleaned_data['groups']) # groups 는 list 이기 때문에 *self 로 사용
         return user
+
+
+class LoginForm(AuthenticationForm):
+
+    username = UsernameField(
+        widget=forms.EmailInput(
+            attrs={
+                'autofocus': True,
+                'class': 'form-control',
+                'placeholder': 'Email',
+            }
+        )
+    )
+    password = forms.CharField(
+        label=_("Password"),
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Password',
+            }
+        ),
+    )
+
+    error_messages = {
+        'invalid_login': _(
+            "입력하신 Email 과 비밀번호가 맞지 않습니다."
+        ),
+        'inactive': _("This account is inactive."),
+    }
