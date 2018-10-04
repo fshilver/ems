@@ -75,6 +75,7 @@ class EquipmentTypeDeleteView(DeleteView):
 class EquipmentListView(ListView):
     model = Equipment
     template_name = 'ems/eq_list.html'
+    paginate_by = 10
 
 
 class EquipmentCreateView(CreateView):
@@ -101,11 +102,13 @@ class UsableEquipmentListView(ListView):
     model = Equipment
     queryset = Equipment.objects.filter(status=Equipment.USABLE)
     template_name = 'ems/usable_eq_list.html'
+    paginate_by = 10
 
 
 class UsedEquipmentListView(ListView):
     model = Equipment
     template_name = 'ems/used_eq_list.html'
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = Equipment.objects.filter(status=Equipment.USED).filter(current_user=self.request.user)
@@ -119,6 +122,7 @@ class ApplyEquipmentListView(ListView):
     model = Equipment
     queryset = Equipment.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_USE)
     template_name = 'ems/apply_eq_list.html'
+    paginate_by = 10
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -178,6 +182,7 @@ class ReturnEquipmentListView(ListView):
     model = Equipment
     queryset = Equipment.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_RETURN)
     template_name = 'ems/return_eq_list.html'
+    paginate_by = 10
 
 
 class ReturnEquipmentView(UpdateView):
