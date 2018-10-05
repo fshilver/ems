@@ -237,7 +237,18 @@ class EquipmentSpecUpdateView(UpdateView):
     template_name = 'ems/eq_spec_form.html'
     success_url = reverse_lazy('ems:eq_list')
 
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        eq = Equipment.objects.get(pk=pk)
+        return EquipmentSpec.objects.filter(equipment__exact=eq).order_by('-count').first()
+
 
 class EquipmentSpecDetailView(DetailView):
     model = EquipmentSpec
     template_name = 'ems/eq_spec_detail.html'
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        eq = Equipment.objects.get(pk=pk)
+        return EquipmentSpec.objects.filter(equipment__exact=eq).order_by('-count').first()
+

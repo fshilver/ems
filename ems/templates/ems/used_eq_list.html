@@ -15,6 +15,8 @@
     <thead>
     <tr class="headings">
         <th class="column-title">ID</th>
+        <th class="column-title">관리번호</th>
+        <th class="column-title">종류</th>
         <th class="column-title">S/N</th>
         <th class="column-title">구입 날짜</th>
         <th class="column-title">상세Spec</th>
@@ -27,6 +29,8 @@
     
     <tr class="{% cycle 'even' 'odd' %} pointer">
         <td>{{ obj.id }}</a></td>
+        <td>{{ obj.management_number }}</a></td>
+        <td>{{ obj.kind }}</a></td>
         <td>{{ obj.serial_number }} </td>
         <td>{{ obj.purchase_date }} </td>
         <td><a class="btn btn-default btn-xs" href="{% url 'ems:eq_spec_detail' obj.id %}">자세히</a></td>
