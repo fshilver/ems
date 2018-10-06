@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView
 from django.urls import reverse_lazy
 from .models import (
@@ -246,6 +247,21 @@ class EquipmentSpecUpdateView(UpdateView):
 class EquipmentSpecDetailView(DetailView):
     model = EquipmentSpec
     template_name = 'ems/eq_spec_detail.html'
+
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            return  JsonResponse({
+                'cpu': self.object.cpu,
+                'mem': self.object.mem,
+                'hdd': self.object.hdd,
+                'nic': self.object.nic,
+                'graphic': self.object.graphic,
+                'etc': self.object.etc,
+                'text': self.object.text,
+            })
+
+        # template rendering
+        return super().render_to_response(context)
 
     def get_object(self):
         pk = self.kwargs.get('pk')

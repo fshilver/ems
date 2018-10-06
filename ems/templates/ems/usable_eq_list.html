@@ -11,7 +11,7 @@
 
 
 {% block table_content %}
-<table class="table table-striped jambo_table">
+<table class="table table-striped jambo_table" id="eq-list">
     <thead>
     <tr class="headings">
         <th class="column-title">ID</th>
@@ -42,3 +42,97 @@
     </tbody>
 </table>
 {% endblock table_content %}
+
+<!--
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Large modal</button>
+-->
+
+{% block modal %}
+<div id="eq-detail-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="modal-title-id">Modal title</h4>
+            </div>
+
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <thead>
+                    <tr class="headings">
+                        <th class="column-title">항목</th>
+                        <th class="column-title">사양</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+
+                    <tr class="even pointer">
+                        <th scope="row">CPU</th><td id='eq-spec-cpu'></td>
+                    </tr>
+                    <tr class="odd pointer">
+                        <th scope="row">메모리</th><td id='eq-spec-mem'></td>
+                    </tr>
+                    <tr class="even pointer">
+                        <th scope="row">HDD</th><td id='eq-spec-hdd'></td>
+                    </tr>
+                    <tr class="odd pointer">
+                        <th scope="row">NIC</th><td id='eq-spec-nic'></td>
+                    </tr>
+                    <tr class="even pointer">
+                        <th scope="row">그래픽카드</th><td id='eq-spec-graphic'></td>
+                    </tr>
+                    <tr class="odd pointer">
+                        <th scope="row">기타</th><td id='eq-spec-etc'></td>
+                    </tr>
+                    <tr class="even pointer">
+                        <th scope="row">텍스트</th><td id='eq-spec-text'></td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock modal %}
+
+
+{% block custom_js %}
+<script>
+$(document).ready(function() {
+
+    $(document).on('click', '#eq-list a', function(e) {
+        e.preventDefault();
+        var detail_url = $(this).attr('href')
+        var management_number = $(this).parent().parent().children().eq(1).text();
+
+        $.get(detail_url)
+        .done(function(obj){
+            var $modal = $('#eq-detail-modal');
+            $modal.find('#modal-title-id').html(management_number);
+            $modal.find('#eq-spec-cpu').html(obj.cpu);
+            $modal.find('#eq-spec-mem').html(obj.mem);
+            $modal.find('#eq-spec-hdd').html(obj.hdd);
+            $modal.find('#eq-spec-nic').html(obj.nic);
+            $modal.find('#eq-spec-graphic').html(obj.graphic);
+            $modal.find('#eq-spec-etc').html(obj.etc);
+            $modal.find('#eq-spec-text').html(obj.text);
+            $modal.modal();
+        })
+        .fail(function(){
+            alert('request failed');
+        })
+    });
+});
+</script>
+{% endblock custom_js %}
