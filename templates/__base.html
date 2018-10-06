@@ -99,9 +99,12 @@
         <script src="{% static 'vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js' %}"></script>
         <!-- starrr -->
         <script src="{% static 'vendors/starrr/dist/starrr.js' %}"></script>
+        <!-- Custom Theme Scripts -->
+        <script src="{% static 'build/js/custom.js' %}"></script>
+        
+        <!-- csrf token 처리 -->
+        <script src="{% static 'jquery.csrf.js' %}"></script>
       {% endblock %}
-      <!-- Custom Theme Scripts -->
-      <script src="{% static 'build/js/custom.js' %}"></script>
     {% endblock body %}
     {% block custom_js %}
     {% endblock custom_js %}
