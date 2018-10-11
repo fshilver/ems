@@ -76,7 +76,6 @@ class EquipmentTypeDeleteView(DeleteView):
 class EquipmentListView(ListView):
     model = Equipment
     template_name = 'ems/eq_list.html'
-    paginate_by = 10
 
 
 class EquipmentCreateView(CreateView):
@@ -100,6 +99,9 @@ class EquipmentDeleteView(DeleteView):
 
 
 class UsableEquipmentListView(ListView):
+    """
+    사용 가능한 장비 목록
+    """
     model = Equipment
     queryset = Equipment.objects.filter(status=Equipment.USABLE)
     template_name = 'ems/usable_eq_list.html'
@@ -116,32 +118,48 @@ class UsableEquipmentListView(ListView):
                     'purchase_date': obj.purchase_date
                     }
                 data.append(eq_data)
-            context = {
-                'data': data
-            }
-            return  JsonResponse(context)
+            return  JsonResponse({'data': data})
 
         # template rendering
         return super().render_to_response(context)
 
+
 class UsedEquipmentListView(ListView):
+    """
+    사용 중인 장비 목록
+    """
     model = Equipment
     template_name = 'ems/used_eq_list.html'
-    paginate_by = 10
 
     def get_queryset(self):
         queryset = Equipment.objects.filter(status=Equipment.USED).filter(current_user=self.request.user)
         return queryset
 
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            data = []
+            for obj in self.object_list:
+                eq_data = {
+                    'id': obj.id,
+                    'management_number': obj.management_number,
+                    'kind': obj.kind.label,
+                    'serial_number': obj.serial_number,
+                    'purchase_date': obj.purchase_date
+                }
+                data.append(eq_data)
+
+            return JsonResponse({'data': data})
+
+        return super().render_to_response(context)
+
 
 class ApplyEquipmentListView(ListView):
-    '''
+    """
     사용 신청한 장비 목록
-    '''
+    """
     model = Equipment
     queryset = Equipment.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_USE)
     template_name = 'ems/apply_eq_list.html'
-    paginate_by = 10
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -150,10 +168,34 @@ class ApplyEquipmentListView(ListView):
             return Equipment.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_USE).filter(current_user=self.request.user)
 
 
+    def get_template_names(self):
+        if self.request.user.is_superuser:
+            return ['ems/apply_eq_list_for_superadmin.html']
+        else:
+            return super().get_template_names()
+
+
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            data = []
+            for obj in self.object_list:
+                eq_data = {
+                    'id': obj.id,
+                    'management_number': obj.management_number,
+                    'serial_number': obj.serial_number,
+                    'requester': obj.current_user.name,
+                    'purchase_date': obj.purchase_date
+                }
+                data.append(eq_data)
+            return JsonResponse({'data': data})
+
+        return super().render_to_response(context)
+
+
 class ApplyToUseEquipmentView(UpdateView):
-    '''
+    """
     장비 사용 신청
-    '''
+    """
     model = Equipment
     fields = ('status',)
     template_name = 'ems/apply_eq_form.html'
@@ -165,32 +207,10 @@ class ApplyToUseEquipmentView(UpdateView):
         return super().form_valid(form)
 
 
-def apply_using_eq(request):
-    if request.is_ajax():
-        if request.method == 'POST':
-            ids = request.POST.getlist('ids[]')
-
-            for id in ids:
-                eq = Equipment.objects.get(id=id)
-                eq.status = Equipment.WAITING_FOR_ACCEPT_TO_USE
-                eq.current_user = request.user
-                eq.save()
-
-            message = "{}번 장비 사용 신청하였습니다.".format(','.join(ids))
-            context = {
-                'message': message
-            }
-            return JsonResponse(context)
-        else:
-            return JsonResponse({'error': '{} is unsupported method'.format(request.method)})
-    else:
-        return JsonResponse({'error': 'This is not a ajax request'})
-
-
 class ApplyEquipmentAcceptView(UpdateView):
-    '''
-    장비 사용 신청 승인
-    '''
+    """
+    장비 사용 승인
+    """
     model = Equipment
     fields = ('status',)
     template_name = 'ems/apply_eq_accept_form.html'
@@ -202,9 +222,9 @@ class ApplyEquipmentAcceptView(UpdateView):
 
 
 class ApplyEquipmentRejectView(UpdateView):
-    '''
+    """
     장비 사용 신청 취소
-    '''
+    """
     model = Equipment
     fields = ('status',)
     template_name = 'ems/apply_eq_reject_form.html'
@@ -217,19 +237,49 @@ class ApplyEquipmentRejectView(UpdateView):
 
 
 class ReturnEquipmentListView(ListView):
-    '''
+    """
     반납 신청한 장비 목록
-    '''
+    """
     model = Equipment
-    queryset = Equipment.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_RETURN)
     template_name = 'ems/return_eq_list.html'
-    paginate_by = 10
+
+    def get_template_names(self):
+        if self.request.user.is_superuser:
+            return ['ems/return_eq_list_for_superadmin.html']
+        return super().get_template_names()
+
+
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return Equipment.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_RETURN)
+        else:
+            return Equipment.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_RETURN).filter(current_user=self.request.user)
+
+
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            data = []
+            for obj in self.object_list:
+                eq_data = {
+                    'id': obj.id,
+                    'management_number': obj.management_number,
+                    'kind': obj.kind.label,
+                    'requester': obj.current_user.name,
+                    'serial_number': obj.serial_number,
+                    'purchase_date': obj.purchase_date
+                    }
+                data.append(eq_data)
+            print("ajax view")
+            return  JsonResponse({'data': data})
+
+        print("template view")
+        return super().render_to_response(context)
 
 
 class ReturnEquipmentView(UpdateView):
-    '''
+    """
     장비 반납 신청
-    '''
+    """
     model = Equipment
     fields = ('status',)
     template_name = 'ems/return_eq.html'
@@ -241,9 +291,9 @@ class ReturnEquipmentView(UpdateView):
 
 
 class ReturnEquipmentAcceptView(UpdateView):
-    '''
+    """
     장비 반납 신청 승인
-    '''
+    """
     model = Equipment
     fields = ('status',)
     template_name = 'ems/return_eq_accept_form.html'
@@ -256,9 +306,9 @@ class ReturnEquipmentAcceptView(UpdateView):
 
 
 class ReturnEquipmentRejectView(UpdateView):
-    '''
+    """
     장비 반납 신청 취소
-    '''
+    """
     model = Equipment
     fields = ('status',)
     template_name = 'ems/return_eq_reject_form.html'

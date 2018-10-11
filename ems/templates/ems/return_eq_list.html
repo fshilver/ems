@@ -10,62 +10,211 @@
 {% endblock table_title %}
 
 
+{% block top_right_button %}
+<div class="form-group pull-right top_search">
+    <button id="table-btn-1" class="btn btn-success" style="display: none;">반납취소</button>
+</div>
+{% endblock top_right_button %}
+
+
 {% block table_content %}
-<table class="table table-striped jambo_table">
+<table id="eq-list" class="table table-striped jambo_table">
     <thead>
-        {% if user.is_superuser %}
-
-            <tr class="headings">
-                <th class="column-title">ID</th>
-                <th class="column-title">S/N</th>
-                <th class="column-title">신청한 사람</th>
-                <th class="column-title">구입 날짜</th>
-                <th class="column-title">상세Spec</th>
-                <th class="column-title" style="width:10%;">승인</th>
-                <th class="column-title" style="width:10%;">반송</th>
-            </tr>
-        
-        {% else %}
-
-            <tr class="headings">
-                <th class="column-title">ID</th>
-                <th class="column-title">S/N</th>
-                <th class="column-title">구입 날짜</th>
-                <th class="column-title">상세Spec</th>
-                <th class="column-title" style="width:10%;">반납신청취소</th>
-            </tr>
-
-        {% endif %}
+        <tr class="headings">
+            <th>
+                <div style="text-align: center;">
+                    <input type="checkbox" name="check-all">
+                </div>
+            </th>
+            <th class="column-title">ID</th>
+            <th class="column-title">관리번호</th>
+            <th class="column-title">S/N</th>
+            <th class="column-title">종류</th>
+            <th class="column-title">구입 날짜</th>
+            <th class="column-title">상세Spec</th>
+        </tr>
     </thead>
-
-    <tbody>
-    {% for obj in object_list %}
-    
-        {% if user.is_superuser %}
-
-            <tr class="{% cycle 'even' 'odd' %} pointer">
-                <td>{{ obj.id }}</a></td>
-                <td>{{ obj.serial_number }} </td>
-                <td>{{ obj.current_user }} </td>
-                <td>{{ obj.purchase_date }} </td>
-                <td><a class="btn btn-default btn-xs" href="{% url 'ems:eq_spec_detail' obj.id %}">자세히</a></td>
-                <td><a class="btn btn-success btn-xs" href="{% url 'ems:return_eq_accept' obj.id %}">승인</a></td>
-                <td><a class="btn btn-success btn-xs" href="{% url 'ems:return_eq_reject' obj.id %}">반송</a></td>
-            </tr>
-
-        {% else %}
-
-            <tr class="{% cycle 'even' 'odd' %} pointer">
-                <td>{{ obj.id }}</a></td>
-                <td>{{ obj.serial_number }} </td>
-                <td>{{ obj.purchase_date }} </td>
-                <td><a class="btn btn-default btn-xs" href="{% url 'ems:eq_spec_detail' obj.id %}">자세히</a></td>
-                <td><a class="btn btn-success btn-xs" href="{% url 'ems:return_eq_reject' obj.id %}">신청취소</a></td>
-            </tr>
-
-        {% endif %}
-
-    {% endfor %}
-    </tbody>
 </table>
 {% endblock table_content %}
+
+
+{% block modal %}
+<div id="eq-detail-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="modal-title-id">Modal title</h4>
+            </div>
+
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <thead>
+                    <tr class="headings">
+                        <th class="column-title">항목</th>
+                        <th class="column-title">사양</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+
+                    <tr class="even pointer">
+                        <th scope="row">CPU</th><td id='eq-spec-cpu'></td>
+                    </tr>
+                    <tr class="odd pointer">
+                        <th scope="row">메모리</th><td id='eq-spec-mem'></td>
+                    </tr>
+                    <tr class="even pointer">
+                        <th scope="row">HDD</th><td id='eq-spec-hdd'></td>
+                    </tr>
+                    <tr class="odd pointer">
+                        <th scope="row">NIC</th><td id='eq-spec-nic'></td>
+                    </tr>
+                    <tr class="even pointer">
+                        <th scope="row">그래픽카드</th><td id='eq-spec-graphic'></td>
+                    </tr>
+                    <tr class="odd pointer">
+                        <th scope="row">기타</th><td id='eq-spec-etc'></td>
+                    </tr>
+                    <tr class="even pointer">
+                        <th scope="row">텍스트</th><td id='eq-spec-text'></td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock modal %}
+
+
+{% block custom_js %}
+<script>
+var table;
+$(document).ready(function() {
+
+    table = $('#eq-list').DataTable(
+        {
+            ajax: "{% url 'ems:return_eq_list' %}",
+            columns: [
+                {
+                    data: function(row, type, set) { return '';},
+                    defaultContent: '',
+                    className: 'select-checkbox',
+                    orderable: false
+                },
+                {"data": "id"},
+                {"data": "management_number"},
+                {"data": "serial_number"},
+                {"data": "kind"},
+                {"data": "purchase_date"},
+                {
+                    data: null,
+                    orderable: false,
+                    defaultContent: '<button class="btn btn-success btn-sm">상세정보</button>'
+                }
+            ],
+            select: {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+            order: [[1, 'desc']]
+        }
+    );
+
+    $('#table-btn-1').on('click', function() {
+        var eq_list = [];
+        $.each(table.rows('.selected').data(), function(index, element) {
+            eq_list.push(element.id);
+        });
+
+        $.ajax({
+            type: 'POST'
+            ,url: "{% url 'ems:reject_return_eq_ajax' %}"
+            ,data: {
+                'ids' : eq_list
+            }
+            ,dataType: 'json'
+            ,success: function(data) {
+                new PNotify({
+                    title: 'Success',
+                    text: data['message'],
+                    type: 'success',
+                    styling: 'bootstrap3'
+                });
+                table.ajax.reload();
+            }
+            ,error: function(error) {
+                new PNotify({
+                    title: 'Error',
+                    text: error,
+                    type: 'error',
+                    styling: 'bootstrap3'
+                });
+            }
+        });
+    });
+
+    // table header 의 첫번째 checkbox 클릭 시 현재 페이지의 모든 row 선택
+    var ckbox = document.querySelector("input[name=check-all]");
+    ckbox.addEventListener( 'change', function() {
+        if(this.checked) {
+            table.rows({page:'current'}).select();
+            $('th.select-checkbox').addClass('selected');
+        }else {
+            table.rows({page:'current'}).deselect();
+            $('th.select-checkbox').removeClass('selected');
+        }
+    });
+
+    // 1개 이상의 row 가 선택될 경우 btn show
+    table.on('select', function(e, dt, type, indexes) {
+        if ($('#table-btn-1').is(":hidden")) {
+            $('#table-btn-1').show();
+        }
+    });
+
+    // row 가 하나도 선택되지 않을 경우 btn hide
+    table.on('deselect', function(e, dt, type, indexes) {
+        var rows = table.rows( { selected: true } ).count();
+        if (rows < 1) {
+            $('#table-btn-1').hide();
+        }
+    });
+
+    // 상세정보 Modal
+    $('#eq-list tbody').on('click', 'button', function() {
+        var id = table.row($(this).parents('tr')).data().id;
+        var detail_url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
+        var management_number = table.row($(this).parents('tr')).data().management_number;
+
+        $.get(detail_url)
+        .done(function(obj){
+            var $modal = $('#eq-detail-modal');
+            $modal.find('#modal-title-id').html(management_number);
+            $modal.find('#eq-spec-cpu').html(obj.cpu);
+            $modal.find('#eq-spec-mem').html(obj.mem);
+            $modal.find('#eq-spec-hdd').html(obj.hdd);
+            $modal.find('#eq-spec-nic').html(obj.nic);
+            $modal.find('#eq-spec-graphic').html(obj.graphic);
+            $modal.find('#eq-spec-etc').html(obj.etc);
+            $modal.find('#eq-spec-text').html(obj.text);
+            $modal.modal();
+        })
+        .fail(function(){
+            alert('request failed');
+        })
+    });
+});
+</script>
+{% endblock custom_js %}
