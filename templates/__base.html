@@ -109,7 +109,8 @@
 
 
     {% block modal %}
-    <div id="detail-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <!-- 단순한 modal -->
+    <div id="modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
         <div class="modal-dialog modal-lg">
 
             <div class="modal-content">
@@ -137,6 +138,39 @@
         </div>
     </div>
     {% endblock modal %}
+
+
+    <!-- form modal -->
+    {% block form_modal %}
+    <div id="form-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+
+              <form action="" method="post">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title" id="modal-title-id">Modal Title</h4>
+                </div><!-- modal-header -->
+
+
+                <div class="modal-body">
+                    {% block form_modal_body %}
+                    {% endblock form_modal_body %}
+                </div><!-- modal-body -->
+
+                <div class="modal-footer">
+                    {% block form_modal_footer %}
+                    <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+                    {% endblock form_modal_footer %}
+                </div><!-- modal-footer -->
+              </form>
+
+            </div>
+        </div>
+    </div>
+    {% endblock form_modal %}
 
 
     {% block custom_js %}

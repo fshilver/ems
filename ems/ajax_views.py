@@ -1,5 +1,9 @@
-from django.http import JsonResponse, HttpResponse
-from .models import Equipment
+from django.http import (
+    JsonResponse,
+    HttpResponse,
+    HttpResponseNotAllowed,
+)
+from .models import Equipment, RepairStatus
 
 ####################################
 # Equipment
@@ -83,3 +87,31 @@ def reject_return_eq(request):
     반납 신청 반송 시 Equipment.current_user 는 이미 설정되어 있었으므로 변경할 필요 없다.
     """
     return update_equipment_status(request, Equipment.USED)
+
+
+
+####################################
+# RepairStatus 
+####################################
+def delete_repair_status(request):
+    """
+    동시에 여러개의 '수리상태' label 을 삭제할 수 있다.
+    """
+    if request.is_ajax():
+        if request.method == 'POST':
+            ids = request.POST.getlist('ids[]')
+
+            for id in ids:
+                status = RepairStatus.objects.get(id=id)
+                status.delete()
+
+            message = "{}번 삭제 성공".format(','.join(ids))
+            context = {
+                'message': message
+            }
+            return JsonResponse(context)
+        else:
+            return JsonResponse({'error': '{} is unsupported method'.format(request.method)})
+    else:
+        return JsonResponse({'error': 'This is not a ajax request'})
+

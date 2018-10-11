@@ -21,6 +21,19 @@ class RepairStatusListView(ListView):
     model = RepairStatus
     template_name = 'ems/repair_status_list.html'
 
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            data = []
+            for obj in self.object_list:
+                status = {
+                    "id": obj.id,
+                    "label": obj.label
+                }
+                data.append(status)
+            return JsonResponse({"data": data})
+        
+        return super().render_to_response(context)
+
 
 class RepairStatusCreateView(CreateView):
     model = RepairStatus
@@ -28,12 +41,22 @@ class RepairStatusCreateView(CreateView):
     success_url = reverse_lazy('ems:repair_status_list')
     fields = ('label',)
 
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return ['ems/repair_status_modal_form.html']
+        return super().get_template_names()
+
 
 class RepairStatusUpdateView(UpdateView):
     model = RepairStatus
     template_name = 'ems/repair_status_form.html'
     success_url = reverse_lazy('ems:repair_status_list')
     fields = ('label',)
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return ['ems/repair_status_modal_form.html']
+        return super().get_template_names()
 
 
 class RepairStatusDeleteView(DeleteView):

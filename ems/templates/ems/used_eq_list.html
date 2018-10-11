@@ -140,7 +140,7 @@ $(document).ready(function() {
 
         $.get(detail_url)
         .done(function(obj){
-            var $modal = $('#detail-modal');
+            var $modal = $('#modal');
             $modal.find('#modal-title-id').html(management_number);
             $modal.find('#eq-spec-cpu').html(obj.cpu);
             $modal.find('#eq-spec-mem').html(obj.mem);
