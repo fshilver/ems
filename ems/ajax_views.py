@@ -3,7 +3,7 @@ from django.http import (
     HttpResponse,
     HttpResponseNotAllowed,
 )
-from .models import Equipment, RepairStatus
+from .models import Equipment, RepairStatus, EquipmentType
 
 ####################################
 # Equipment
@@ -103,6 +103,32 @@ def delete_repair_status(request):
 
             for id in ids:
                 status = RepairStatus.objects.get(id=id)
+                status.delete()
+
+            message = "{}번 삭제 성공".format(','.join(ids))
+            context = {
+                'message': message
+            }
+            return JsonResponse(context)
+        else:
+            return JsonResponse({'error': '{} is unsupported method'.format(request.method)})
+    else:
+        return JsonResponse({'error': 'This is not a ajax request'})
+
+
+####################################
+# EquipmentType 
+####################################
+def delete_equipment_type(request):
+    """
+    동시에 여러개의 '장비종류' label 을 삭제할 수 있다.
+    """
+    if request.is_ajax():
+        if request.method == 'POST':
+            ids = request.POST.getlist('ids[]')
+
+            for id in ids:
+                status = EquipmentType.objects.get(id=id)
                 status.delete()
 
             message = "{}번 삭제 성공".format(','.join(ids))

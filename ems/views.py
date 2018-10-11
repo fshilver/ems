@@ -72,6 +72,19 @@ class EquipmentTypeListView(ListView):
     model = EquipmentType
     template_name = 'ems/eq_type_list.html'
 
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            data = []
+            for obj in self.object_list:
+                status = {
+                    "id": obj.id,
+                    "label": obj.label
+                }
+                data.append(status)
+            return JsonResponse({"data": data})
+        
+        return super().render_to_response(context)
+
 
 class EquipmentTypeCreateView(CreateView):
     model = EquipmentType
@@ -79,12 +92,22 @@ class EquipmentTypeCreateView(CreateView):
     success_url = reverse_lazy('ems:eq_type_list')
     fields = ('label',)
 
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return ['ems/eq_type_modal_form.html']
+        return super().get_template_names()
+
 
 class EquipmentTypeUpdateView(UpdateView):
     model = EquipmentType
     template_name = 'ems/eq_type_form.html'
     success_url = reverse_lazy('ems:eq_type_list')
     fields = ('label',)
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return ['ems/eq_type_modal_form.html']
+        return super().get_template_names()
 
 
 class EquipmentTypeDeleteView(DeleteView):
