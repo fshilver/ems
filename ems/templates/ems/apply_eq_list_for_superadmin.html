@@ -38,66 +38,6 @@
 {% endblock table_content %}
 
 
-{% block modal %}
-<div id="eq-detail-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
-                </button>
-                <h4 class="modal-title" id="modal-title-id">Modal title</h4>
-            </div>
-
-            <div class="modal-body">
-                <table class="table table-striped">
-                    <thead>
-                    <tr class="headings">
-                        <th class="column-title">항목</th>
-                        <th class="column-title">사양</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-
-                    <tr class="even pointer">
-                        <th scope="row">CPU</th><td id='eq-spec-cpu'></td>
-                    </tr>
-                    <tr class="odd pointer">
-                        <th scope="row">메모리</th><td id='eq-spec-mem'></td>
-                    </tr>
-                    <tr class="even pointer">
-                        <th scope="row">HDD</th><td id='eq-spec-hdd'></td>
-                    </tr>
-                    <tr class="odd pointer">
-                        <th scope="row">NIC</th><td id='eq-spec-nic'></td>
-                    </tr>
-                    <tr class="even pointer">
-                        <th scope="row">그래픽카드</th><td id='eq-spec-graphic'></td>
-                    </tr>
-                    <tr class="odd pointer">
-                        <th scope="row">기타</th><td id='eq-spec-etc'></td>
-                    </tr>
-                    <tr class="even pointer">
-                        <th scope="row">텍스트</th><td id='eq-spec-text'></td>
-                    </tr>
-
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-{% endblock modal %}
-
-
 {% block custom_js %}
 <script>
 var table;
@@ -239,7 +179,7 @@ $(document).ready(function() {
 
         $.get(detail_url)
         .done(function(obj){
-            var $modal = $('#eq-detail-modal');
+            var $modal = $('#detail-modal');
             $modal.find('#modal-title-id').html(management_number);
             $modal.find('#eq-spec-cpu').html(obj.cpu);
             $modal.find('#eq-spec-mem').html(obj.mem);
