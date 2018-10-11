@@ -16,8 +16,12 @@ def update_equipment_status(request, status, user=None):
                 eq = Equipment.objects.get(id=id)
                 eq.status = status
 
-                if eq.current_user is None and user is not None:
-                    eq.current_user = user
+                if user:
+                    # 사용하는 사람 '없음' 으로 변경
+                    if user == 'null':
+                        eq.current_user = None
+                    else:
+                        eq.current_user = user
 
                 eq.save()
 
@@ -53,7 +57,7 @@ def reject_use_eq(request):
     장비 사용 신청 반송
     사용 신청 반송 시 Equipment.current_user 는 다시 None 이 되어야 한다.
     """
-    return update_equipment_status(request, Equipment.USABLE, None)
+    return update_equipment_status(request, Equipment.USABLE, 'null')
 
 
 def apply_return_eq(request):
@@ -70,7 +74,7 @@ def accept_return_eq(request):
     장비 반납 신청 승인
     반납 후 Equipment.current_user 는 None 이 되어야 한다.
     """
-    return update_equipment_status(request, Equipment.USABLE, None)
+    return update_equipment_status(request, Equipment.USABLE, 'null')
 
 
 def reject_return_eq(request):
