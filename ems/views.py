@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView
 from django.urls import reverse_lazy
 from .models import (
@@ -103,8 +103,26 @@ class UsableEquipmentListView(ListView):
     model = Equipment
     queryset = Equipment.objects.filter(status=Equipment.USABLE)
     template_name = 'ems/usable_eq_list.html'
-    paginate_by = 10
 
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            data = []
+            for obj in self.object_list:
+                eq_data = {
+                    'id': obj.id,
+                    'management_number': obj.management_number,
+                    'kind': obj.kind.label,
+                    'serial_number': obj.serial_number,
+                    'purchase_date': obj.purchase_date
+                    }
+                data.append(eq_data)
+            context = {
+                'data': data
+            }
+            return  JsonResponse(context)
+
+        # template rendering
+        return super().render_to_response(context)
 
 class UsedEquipmentListView(ListView):
     model = Equipment
@@ -145,6 +163,28 @@ class ApplyToUseEquipmentView(UpdateView):
         form.instance.current_user = self.request.user
         form.instance.status = Equipment.WAITING_FOR_ACCEPT_TO_USE
         return super().form_valid(form)
+
+
+def apply_using_eq(request):
+    if request.is_ajax():
+        if request.method == 'POST':
+            ids = request.POST.getlist('ids[]')
+
+            for id in ids:
+                eq = Equipment.objects.get(id=id)
+                eq.status = Equipment.WAITING_FOR_ACCEPT_TO_USE
+                eq.current_user = request.user
+                eq.save()
+
+            message = "{}번 장비 사용 신청하였습니다.".format(','.join(ids))
+            context = {
+                'message': message
+            }
+            return JsonResponse(context)
+        else:
+            return JsonResponse({'error': '{} is unsupported method'.format(request.method)})
+    else:
+        return JsonResponse({'error': 'This is not a ajax request'})
 
 
 class ApplyEquipmentAcceptView(UpdateView):

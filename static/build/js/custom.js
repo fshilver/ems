@@ -5112,7 +5112,7 @@ $(document).ready(function() {
     init_DataTables();
     init_chart_doughnut();
     init_gauge();
-    init_PNotify();
+    // init_PNotify();  // to remove default notify section on the page
     init_starrr();
     init_calendar();
     init_compose();

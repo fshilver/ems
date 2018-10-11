@@ -24,6 +24,7 @@ from .views import (
     ReturnEquipmentListView,
     ReturnEquipmentAcceptView,
     ReturnEquipmentRejectView,
+    apply_using_eq,
 )
 
 urlpatterns = [
@@ -39,6 +40,7 @@ urlpatterns = [
     path('eq/usable/', UsableEquipmentListView.as_view(), name='usable_eq_list'),
     path('eq/used/', UsedEquipmentListView.as_view(), name='used_eq_list'),
     path('eq/apply/', ApplyEquipmentListView.as_view(), name='apply_eq_list'),
+    path('eq/apply/ajax/', apply_using_eq, name='apply_eq_ajax'),
     path('eq/apply/<int:pk>/', ApplyToUseEquipmentView.as_view(), name='apply_eq'),
     path('eq/apply/<int:pk>/accept/', ApplyEquipmentAcceptView.as_view(), name='apply_eq_accept'),
     path('eq/apply/<int:pk>/reject/', ApplyEquipmentRejectView.as_view(), name='apply_eq_reject'),
