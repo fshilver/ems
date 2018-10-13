@@ -29,7 +29,7 @@
             <th class="column-title">ID</th>
             <th class="column-title">관리번호</th>
             <th class="column-title">종류</th>
-            <th class="column-title">S/N</th>
+            <th class="column-title">모델</th>
             <th class="column-title">구입 날짜</th>
             <th class="column-title">상세Spec</th>
         </tr>
@@ -56,12 +56,18 @@ $(document).ready(function() {
                 {"data": "id"},
                 {"data": "management_number"},
                 {"data": "kind"},
-                {"data": "serial_number"},
+                {"data": "model"},
                 {"data": "purchase_date"},
                 {
                     data: null,
                     orderable: false,
                     defaultContent: '<button class="btn btn-success btn-sm">상세정보</button>'
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: [1],
+                    visible: false
                 }
             ],
             select: {

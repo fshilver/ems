@@ -62,6 +62,7 @@ class EquipmentCreationForm(forms.ModelForm):
                 format='%Y-%m-%d'
             ),
             'price': forms.NumberInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+            'status': forms.Select(attrs={'class': 'form-control col-md-7 col-xs-12'}),
         }
 
     def save(self):
@@ -123,10 +124,28 @@ class EquipmentForm(forms.ModelForm):
             'purchase_date': forms.DateInput(
                 attrs={
                     'class': 'form-control col-md-7 col-xs-12',
-                    'placeholder': '2018-10-01',
+                    'placeholder': '입력 포맷 예) 2018-10-01',
                     },
                 format='%Y-%m-%d'
             ),
             'price': forms.NumberInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
+            'current_user': forms.Select(attrs={'class': 'form-control'}),
+            'kind': forms.Select(attrs={'class': 'form-control'}),
+            'management_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'accessibility': forms.Select(attrs={'class': 'form-control'}),
+            'manufacturer': forms.TextInput(attrs={'class': 'form-control'}),
+            'model': forms.TextInput(attrs={'class': 'form-control'}),
+            'purpose': forms.Textarea(attrs={'class': 'form-control'}),
+            'check_in_duedate': forms.DateInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': '입력 포맷 예) 2018-10-01',
+                    },
+                format='%Y-%m-%d'
+            ),
+            'buying_shop': forms.TextInput(attrs={'class': 'form-control'}),
+            'purchase_manager': forms.Select(attrs={'class': 'form-control'}),
+            'document': forms.TextInput(attrs={'class': 'form-control'}),
         }
         

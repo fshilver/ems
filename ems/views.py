@@ -1,3 +1,4 @@
+from django.forms.models import model_to_dict
 from django.http import JsonResponse, HttpResponse
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView
 from django.urls import reverse_lazy
@@ -123,6 +124,35 @@ class EquipmentListView(ListView):
     model = Equipment
     template_name = 'ems/eq_list.html'
 
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            data = []
+            for obj in self.object_list:
+                if obj.current_user is None:
+                    current_user_name = '-'
+                else:
+                    current_user_name = obj.current_user.name
+
+                if obj.purchase_request_user is None:
+                    purchase_requester_name = '-'
+                else:
+                    purchase_requester_name = obj.purchase_request_user.name
+
+                eq = {
+                    'id': obj.id,
+                    'management_number': obj.management_number,
+                    'kind': obj.kind.label,
+                    'model': obj.model,
+                    'serial_number': obj.serial_number,
+                    'purchase_date': obj.purchase_date,
+                    'current_user': current_user_name,
+                    'purchase_requester': purchase_requester_name,
+                    'price': obj.price,
+                }
+                data.append(eq)
+            return JsonResponse({"data":data})
+        return super().render_to_response(context)
+
 
 class EquipmentCreateView(CreateView):
     model = Equipment
@@ -136,6 +166,17 @@ class EquipmentUpdateView(UpdateView):
     form_class = EquipmentForm
     template_name = 'ems/eq_form.html'
     success_url = reverse_lazy('ems:eq_list')
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return 'ems/eq_modal_form.html'
+        return super().get_template_names()
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.is_ajax():
+            return HttpResponse("업데이트 성공")
+        return response
 
 
 class EquipmentDeleteView(DeleteView):
@@ -160,6 +201,7 @@ class UsableEquipmentListView(ListView):
                     'id': obj.id,
                     'management_number': obj.management_number,
                     'kind': obj.kind.label,
+                    'model': obj.model,
                     'serial_number': obj.serial_number,
                     'purchase_date': obj.purchase_date
                     }
@@ -189,6 +231,7 @@ class UsedEquipmentListView(ListView):
                     'id': obj.id,
                     'management_number': obj.management_number,
                     'kind': obj.kind.label,
+                    'model': obj.model,
                     'serial_number': obj.serial_number,
                     'purchase_date': obj.purchase_date
                 }
@@ -229,6 +272,7 @@ class ApplyEquipmentListView(ListView):
                     'id': obj.id,
                     'management_number': obj.management_number,
                     'serial_number': obj.serial_number,
+                    'model': obj.model,
                     'requester': obj.current_user.name,
                     'purchase_date': obj.purchase_date
                 }
@@ -310,6 +354,7 @@ class ReturnEquipmentListView(ListView):
                     'id': obj.id,
                     'management_number': obj.management_number,
                     'kind': obj.kind.label,
+                    'model': obj.model,
                     'requester': obj.current_user.name,
                     'serial_number': obj.serial_number,
                     'purchase_date': obj.purchase_date

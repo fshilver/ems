@@ -22,15 +22,11 @@
 
         <li><a><i class="fa fa-cogs"></i> 관리자 설정 <span class="fa fa-chevron-down"></span></a>
           <ul class="nav child_menu">
-            <li><a href="{% url 'accounts:user_list' %}">사용자 관리</a></li>
-            <li><a href="#">장비 관리<span class="fa fa-chevron-down"></span></a>
-              <ul class="nav child_menu">
-                <li><a href="{% url 'ems:repair_status_list' %}">수리 상태 Label</a></li>
-                <li><a href="{% url 'ems:eq_type_list' %}">장비 타입 Label</a></li>
-                <li><a href="{% url 'ems:eq_list' %}">장비 목록</a></li>
-              </ul>
-            </li>
-            <li><a href="{% url 'accounts:group_list' %}">그룹 관리</a></li>
+            <li><a href="{% url 'accounts:user_list' %}">사용자</a></li>
+            <li><a href="{% url 'accounts:group_list' %}">그룹</a></li>
+            <li><a href="{% url 'ems:eq_list' %}">장비</a></li>
+            <li><a href="{% url 'ems:repair_status_list' %}">수리 상태 라벨</a></li>
+            <li><a href="{% url 'ems:eq_type_list' %}">장비 타입 라벨</a></li>
           </ul>
         </li>
 
