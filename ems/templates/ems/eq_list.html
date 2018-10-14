@@ -147,20 +147,15 @@ $(document).ready(function() {
     // 상세정보 modal
     $('#table tbody').on('click', 'button.btn-detail', function() {
         var id = table.row($(this).parents('tr')).data().id;
-        var url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
+        var url = "{% url 'ems:eq_spec_update' 9999 %}".replace(/9999/, id);
         var management_number = table.row($(this).parents('tr')).data().management_number;
 
         $.get(url)
             .done(function(obj){
-                var $modal = $('#modal');
-                $modal.find('#modal-title-id').html(management_number);
-                $modal.find('#eq-spec-cpu').html(obj.cpu);
-                $modal.find('#eq-spec-mem').html(obj.mem);
-                $modal.find('#eq-spec-hdd').html(obj.hdd);
-                $modal.find('#eq-spec-nic').html(obj.nic);
-                $modal.find('#eq-spec-graphic').html(obj.graphic);
-                $modal.find('#eq-spec-etc').html(obj.etc);
-                $modal.find('#eq-spec-text').html(obj.text);
+                var $modal = $('#form-modal');
+                $modal.find('form').attr('action', url);
+                $modal.find('.modal-content form').html(obj);
+                $modal.find('.modal-footer .btn-success').html('수정');
                 $modal.modal();
             })
             .fail(function(){
@@ -217,6 +212,7 @@ $(document).ready(function() {
             if ($resp.find('.bad').length > 0) {
                 $('#form-modal form').html(html);
             } else {
+                table.ajax.reload();
                 alert(html);
                 $('#form-modal').modal('hide');
             }

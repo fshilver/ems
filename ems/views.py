@@ -11,6 +11,7 @@ from .models import (
 from .forms import (
     EquipmentSpecForm,
     EquipmentForm,
+    EquipmentUpdateForm,
 )
 
 
@@ -174,7 +175,7 @@ class EquipmentCreateView(CreateView):
 
 class EquipmentUpdateView(UpdateView):
     model = Equipment
-    form_class = EquipmentForm
+    form_class = EquipmentUpdateForm
     template_name = 'ems/eq_form.html'
     success_url = reverse_lazy('ems:eq_list')
 
@@ -186,7 +187,7 @@ class EquipmentUpdateView(UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         if self.request.is_ajax():
-            return HttpResponse("업데이트 성공")
+            return HttpResponse("성공")
         return response
 
 
@@ -434,6 +435,17 @@ class EquipmentSpecUpdateView(UpdateView):
         pk = self.kwargs.get('pk')
         eq = Equipment.objects.get(pk=pk)
         return EquipmentSpec.objects.filter(equipment__exact=eq).order_by('-count').first()
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return ['ems/eq_spec_modal_form.html']
+        return super().get_template_names()
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.is_ajax():
+            return HttpResponse("성공")
+        return response
 
 
 class EquipmentSpecDetailView(DetailView):
