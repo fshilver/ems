@@ -83,10 +83,10 @@ class EquipmentSpec(models.Model):
     # 별도의 클래스로 분리 필요
     change_date  = models.CharField(max_length=50, blank=True, null=True, verbose_name='변경날짜')
     change_reason= models.CharField(max_length=50, blank=True, null=True, verbose_name='변경사유및내역')
-    cost         = models.IntegerField(verbose_name='소요비용')
-    change_user  = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, related_name='change_user', verbose_name='담당')
+    cost         = models.IntegerField(verbose_name='소요비용', blank=True, null=True)
+    change_user  = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL,blank=True, null=True, related_name='change_user', verbose_name='담당')
     reference    = models.CharField(max_length=50, blank=True, null=True, verbose_name='관련근거')
-    count        = models.SmallIntegerField(verbose_name='Count')
+    count        = models.SmallIntegerField(verbose_name='Count', blank=True, null=True)
 
 
 class EquipmentHistory(models.Model):

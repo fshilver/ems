@@ -52,7 +52,6 @@ urlpatterns = [
 
     path('eq_type/delete/ajax/', delete_equipment_type, name='delete_eq_type_ajax'),
 
-    path('eq/', EquipmentListView.as_view(), name='eq_list'),
     path('eq/usable/', UsableEquipmentListView.as_view(), name='usable_eq_list'),
 
     # 사용 중인 장비 목록
@@ -87,6 +86,8 @@ urlpatterns = [
     path('eq/return/reject/ajax/', reject_return_eq, name='reject_return_eq_ajax'),
     path('eq/return/<int:pk>/reject/', ReturnEquipmentRejectView.as_view(), name='return_eq_reject'),
 
+    # 장비 CRUD
+    path('eq/', EquipmentListView.as_view(), name='eq_list'),
     path('eq/create/', EquipmentCreateView.as_view(), name='eq_create'),
     path('eq/update/<int:pk>', EquipmentUpdateView.as_view(), name='eq_update'),
     path('eq/delete/<int:pk>', EquipmentDeleteView.as_view(), name='eq_delete'),

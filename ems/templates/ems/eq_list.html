@@ -117,40 +117,6 @@ $(document).ready(function() {
         }
     );
 
-    // 추가
-    $('#table-btn-create').on('click', function() {
-        var eq_list = [];
-        $.each(table.rows('.selected').data(), function(index, element) {
-            eq_list.push(element.id);
-        });
-
-        $.ajax({
-            type: 'POST'
-            ,url: "{% url 'ems:apply_eq_ajax' %}"
-            ,data: {
-                'ids' : eq_list
-            }
-            ,dataType: 'json'
-            ,success: function(data) {
-                new PNotify({
-                    title: 'Success',
-                    text: data['message'],
-                    type: 'success',
-                    styling: 'bootstrap3'
-                });
-                table.ajax.reload();
-            }
-            ,error: function(error) {
-                new PNotify({
-                    title: 'Error',
-                    text: error,
-                    type: 'error',
-                    styling: 'bootstrap3'
-                });
-            }
-        });
-    });
-
     // table header 의 첫번째 checkbox 클릭 시 현재 페이지의 모든 row 선택
     var ckbox = document.querySelector("input[name=check-all]");
     ckbox.addEventListener( 'change', function() {
@@ -181,10 +147,10 @@ $(document).ready(function() {
     // 상세정보 modal
     $('#table tbody').on('click', 'button.btn-detail', function() {
         var id = table.row($(this).parents('tr')).data().id;
-        var detail_url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
+        var url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
         var management_number = table.row($(this).parents('tr')).data().management_number;
 
-        $.get(detail_url)
+        $.get(url)
             .done(function(obj){
                 var $modal = $('#modal');
                 $modal.find('#modal-title-id').html(management_number);
@@ -199,7 +165,23 @@ $(document).ready(function() {
             })
             .fail(function(){
                 alert('request failed');
+            });
+    });
+
+    // 추가 modal
+    $('#table-btn-create').on('click', function() {
+        var url = "{% url 'ems:eq_create' %}"
+
+        $.get(url)
+            .done(function(obj) {
+                var $modal = $('#form-modal');
+                $modal.find('form').attr('action', url);
+                $modal.find('.modal-content form').html(obj);
+                $modal.modal();
             })
+            .fail(function() {
+                alert('request failed');
+            });
     });
 
     // 수정 modal
@@ -208,17 +190,18 @@ $(document).ready(function() {
         var url = '{% url "ems:eq_update" 9999 %}'.replace(/9999/, id);
 
         $.get(url)
-        .done(function(obj) {
-            var $modal = $('#form-modal');
-            $modal.find('form').attr('action', url);
-            $modal.find('.modal-content form').html(obj);
-            $modal.modal();
-        })
-        .fail(function() {
-            alert('request failed');
-        });
+            .done(function(obj) {
+                var $modal = $('#form-modal');
+                $modal.find('form').attr('action', url);
+                $modal.find('.modal-content form').html(obj);
+                $modal.modal();
+            })
+            .fail(function() {
+                alert('request failed');
+            });
     })
 
+    // modal submit 버튼 처리
     $(document).on('submit', '#form-modal form', function(e) {
         e.preventDefault();
         var $form = $(this);

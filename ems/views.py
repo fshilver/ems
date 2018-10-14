@@ -9,7 +9,6 @@ from .models import (
     EquipmentSpec,
 )
 from .forms import (
-    EquipmentCreationForm,
     EquipmentSpecForm,
     EquipmentForm,
 )
@@ -156,9 +155,21 @@ class EquipmentListView(ListView):
 
 class EquipmentCreateView(CreateView):
     model = Equipment
-    form_class = EquipmentCreationForm
+    # form_class = EquipmentCreationForm
+    form_class = EquipmentForm
     template_name = 'ems/eq_form.html'
     success_url = reverse_lazy('ems:eq_list')
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return 'ems/eq_modal_form.html'
+        return super().get_template_names()
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.is_ajax():
+            return HttpResponse("성공")
+        return response
 
 
 class EquipmentUpdateView(UpdateView):
