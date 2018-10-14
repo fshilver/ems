@@ -1,0 +1,208 @@
+{% extends "_list_as_table.html" %}
+
+{% block title %}
+반납 신청한 장비 목록
+{% endblock title %}
+
+
+
+{% block table_title %}
+{% endblock table_title %}
+
+
+{% block top_right_button %}
+<div class="form-group pull-right top_search">
+    <button id="table-btn-accept" class="btn btn-success" style="display: none;">반납승인</button>
+    <button id="table-btn-reject" class="btn btn-success" style="display: none;">반납취소</button>
+</div>
+{% endblock top_right_button %}
+
+
+{% block table_content %}
+<table id="eq-list" class="table table-striped jambo_table">
+    <thead>
+        <tr class="headings">
+            <th>
+                <div style="text-align: center;">
+                    <input type="checkbox" name="check-all">
+                </div>
+            </th>
+            <th class="column-title">ID</th>
+            <th class="column-title">관리번호</th>
+            <th class="column-title">종류</th>
+            <th class="column-title">모델</th>
+            <th class="column-title">구입 날짜</th>
+            <th class="column-title">반납 신청자</th>
+            <th class="column-title">상세Spec</th>
+        </tr>
+    </thead>
+</table>
+{% endblock table_content %}
+
+
+{% block custom_js %}
+<script>
+var table;
+$(document).ready(function() {
+
+    table = $('#eq-list').DataTable(
+        {
+            ajax: "{% url 'ems:return_eq_list' %}",
+            columns: [
+                {
+                    data: function(row, type, set) { return '';},
+                    defaultContent: '',
+                    className: 'select-checkbox',
+                    orderable: false
+                },
+                {"data": "id"},
+                {"data": "management_number"},
+                {"data": "kind"},
+                {"data": "model"},
+                {"data": "purchase_date"},
+                {"data": "requester"},
+                {
+                    data: null,
+                    orderable: false,
+                    defaultContent: '<button class="btn btn-success btn-sm">상세정보</button>'
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: [1],
+                    visible: false
+                }
+            ],
+            select: {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+            order: [[1, 'desc']]
+        }
+    );
+
+    // 반납 신청 승인
+    $('#table-btn-accept').on('click', function() {
+        var eq_list = [];
+        $.each(table.rows('.selected').data(), function(index, element) {
+            eq_list.push(element.id);
+        });
+
+        $.ajax({
+            type: 'POST'
+            ,url: "{% url 'ems:accept_return_eq_ajax' %}"
+            ,data: {
+                'ids' : eq_list
+            }
+            ,dataType: 'json'
+            ,success: function(data) {
+                new PNotify({
+                    title: 'Success',
+                    text: data['message'],
+                    type: 'success',
+                    styling: 'bootstrap3'
+                });
+                table.ajax.reload();
+            }
+            ,error: function(error) {
+                new PNotify({
+                    title: 'Error',
+                    text: error,
+                    type: 'error',
+                    styling: 'bootstrap3'
+                });
+            }
+        });
+    });
+
+    // 반납 신청 취소
+    $('#table-btn-reject').on('click', function() {
+        var eq_list = [];
+        $.each(table.rows('.selected').data(), function(index, element) {
+            eq_list.push(element.id);
+        });
+
+        $.ajax({
+            type: 'POST'
+            ,url: "{% url 'ems:reject_return_eq_ajax' %}"
+            ,data: {
+                'ids' : eq_list
+            }
+            ,dataType: 'json'
+            ,success: function(data) {
+                new PNotify({
+                    title: 'Success',
+                    text: data['message'],
+                    type: 'success',
+                    styling: 'bootstrap3'
+                });
+                table.ajax.reload();
+            }
+            ,error: function(error) {
+                new PNotify({
+                    title: 'Error',
+                    text: error,
+                    type: 'error',
+                    styling: 'bootstrap3'
+                });
+            }
+        });
+    });
+
+    // table header 의 첫번째 checkbox 클릭 시 현재 페이지의 모든 row 선택
+    var ckbox = document.querySelector("input[name=check-all]");
+    ckbox.addEventListener( 'change', function() {
+        if(this.checked) {
+            table.rows({page:'current'}).select();
+            $('th.select-checkbox').addClass('selected');
+        }else {
+            table.rows({page:'current'}).deselect();
+            $('th.select-checkbox').removeClass('selected');
+        }
+    });
+
+    // 1개 이상의 row 가 선택될 경우 btn show
+    table.on('select', function(e, dt, type, indexes) {
+        if ($('#table-btn-accept').is(":hidden")) {
+            $('#table-btn-accept').show();
+        }
+        if ($('#table-btn-reject').is(":hidden")) {
+            $('#table-btn-reject').show();
+        }
+    });
+
+    // row 가 하나도 선택되지 않을 경우 btn hide
+    table.on('deselect', function(e, dt, type, indexes) {
+        var rows = table.rows( { selected: true } ).count();
+        if (rows < 1) {
+            $('#table-btn-accept').hide();
+            $('#table-btn-reject').hide();
+        }
+    });
+
+    // 상세정보 Modal
+    $('#eq-list tbody').on('click', 'button', function() {
+        var id = table.row($(this).parents('tr')).data().id;
+        var detail_url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
+        var management_number = table.row($(this).parents('tr')).data().management_number;
+
+        $.get(detail_url)
+        .done(function(obj){
+            var $modal = $('#modal');
+            $modal.find('#modal-title-id').html(management_number);
+            $modal.find('#eq-spec-cpu').html(obj.cpu);
+            $modal.find('#eq-spec-mem').html(obj.mem);
+            $modal.find('#eq-spec-hdd').html(obj.hdd);
+            $modal.find('#eq-spec-nic').html(obj.nic);
+            $modal.find('#eq-spec-graphic').html(obj.graphic);
+            $modal.find('#eq-spec-etc').html(obj.etc);
+            $modal.find('#eq-spec-text').html(obj.text);
+            $modal.modal();
+        })
+        .fail(function(){
+            alert('request failed');
+        })
+    });
+});
+</script>
+{% endblock custom_js %}

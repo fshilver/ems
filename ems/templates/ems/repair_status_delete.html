@@ -1,0 +1,10 @@
+{% extends "_common_delete.html" %}
+
+{% block title %}
+수리 상태 Label 삭제
+{% endblock title %}
+
+
+{% block cancel_link %}
+    {% url 'ems:repair_status_list' %}
+{% endblock cancel_link %}

@@ -1,0 +1,56 @@
+{% extends "_form.html" %}
+
+{% block title %}
+장비 {% if object %}수정{% else %}생성{% endif %}
+{% endblock title %}
+
+
+{% block form_block %}
+<form method="POST" class="form-horizontal form-label-left">{% csrf_token %}
+
+
+    {% for field in form %}
+
+        {% if field.errors %}
+
+            <div class="item form-group bad">  <!-- error 가 있는 경우 item, bad class 추가 -->
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ field.name }}">
+                {{ field.label }} {% if field.field.required %}<span class="required">(*)</span>{% endif %}
+                </label>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                {{ field }}
+                </div>
+                {% for error in field.errors %} <!-- error 메시지 출력 -->
+                <div class="alert">{{ error|escape }}</div>
+                {% endfor %}
+            </div>
+        
+        {% else %}
+
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ field.name }}">
+                {{ field.label }} {% if field.field.required %}<span class="required">(*)</span>{% endif %}
+                </label>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                {{ field }}
+                </div>
+            </div>
+
+        {% endif %}
+
+    {% endfor %}
+
+
+    <div class="form-group">
+        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-4">
+        <a class="btn btn-primary" href="{% url 'ems:eq_list' %}">취소</a>
+        {% if object %}
+        <button type="submit" class="btn btn-success">변경</button>
+        {% else %}
+        <button type="submit" class="btn btn-success">생성</button>
+        {% endif %}
+        </div>
+    </div>
+
+</form>
+{% endblock form_block %}

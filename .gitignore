@@ -34,3 +34,4 @@ cscope.*
 *.vcproj
 
 .python-version
+*.ipynb

@@ -1,0 +1,88 @@
+{% extends "__base.html" %}
+{% load staticfiles %}
+
+{% block title %} Login {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <!-- Animate.css -->
+  <link href="{% static 'vendors/animate.css/animate.min.css' %}" rel="stylesheet">
+  <style>
+      #login-logo-img {
+          margin: 70px auto;
+      }
+  </style>
+{% endblock stylesheets %}
+
+{% block body_class %}login{% endblock body_class %}
+
+{% block body %}
+  <div>
+    <a class="hiddenanchor" id="signup"></a>
+    <a class="hiddenanchor" id="signin"></a>
+
+    <div class="login_wrapper">
+      <div class="animate form login_form">
+        <section class="login_content">
+          <form method="POST">{% csrf_token %}
+            <img id="login-logo-img" src="{% static 'images/castis-logo.png' %}" alt="">
+
+            {% if form.non_field_errors %}
+            <div>{{ form.non_field_errors.as_text }}</div>
+            {% endif %}
+
+            {% for field in form %}
+              <div>
+                {{ field }}
+              </div>
+            {% endfor %}
+
+            <button class="btn btn-default submit" type="submit">Log in</button>
+            <input type="hidden" name="next" value="{{ next }}">
+
+            <div class="clearfix"></div>
+
+            <div class="separator">
+                <a href="#signup" class="to_register"> 계정 신청하기 </a>
+              <div class="clearfix"></div>
+              <br />
+
+              <div>
+                <p>Copyright(c) (주)캐스트이즈. All Rights Reserved.</p>
+              </div>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <div id="register" class="animate form registration_form">
+        <section class="login_content">
+          <form>{% csrf_token %}
+            <h1>계정 신청</h1>
+            <div>
+              <input type="text" class="form-control" placeholder="성함을 입력해주세요." required name="{{ form.name.html_name }}"/>
+            </div>
+            <div>
+              <input type="email" class="form-control" placeholder="Email" required name="{{ form.username.html_name }}"/>
+            </div>
+            <div>
+              <input type="password" class="form-control" placeholder="Password" required name="{{ form.password.html_name }}"/>
+            </div>
+
+            <button class="btn btn-default submit" type="submit">신청하기</button>
+            <input type="hidden" name="next" value="{{ next }}">
+
+            <div class="clearfix"></div>
+
+            <div class="separator">
+              <div>
+                <p>Copyright(c) (주)캐스트이즈. All Rights Reserved.</p>
+              </div>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+{% endblock body %}
+

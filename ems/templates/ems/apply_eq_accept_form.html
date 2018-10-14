@@ -1,0 +1,27 @@
+{% extends "_form.html" %}
+
+{% block title %}
+장비 사용 승인
+{% endblock title %}
+
+
+{% block form_block %}
+<form method="POST" class="form-horizontal form-label-left">{% csrf_token %}
+
+    사용 신청 승인 하시겠습니까?
+
+    <div class="form-group">
+        <div class="col-md-6 col-sm-6 col-xs-12">
+            {{ form.status.as_hidden }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-4">
+        <a class="btn btn-primary" href="{% url 'ems:usable_eq_list' %}">취소</a>
+        <button type="submit" class="btn btn-success">사용 신청 승인</button>
+        </div>
+    </div>
+
+</form>
+{% endblock form_block %}

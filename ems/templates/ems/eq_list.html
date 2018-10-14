@@ -1,0 +1,233 @@
+{% extends "_list_as_table.html" %}
+
+{% block title %}
+장비 목록
+{% endblock title %}
+
+
+{% block top_right_button %}
+{% comment %} <div class="col-md-2 col-sm-2 col-xs-12 form-group pull-right top_search"> {% endcomment %}
+<div class="form-group pull-right top_search">
+    <button id="table-btn-create" class="btn btn-success">추가</button>
+    <button id="table-btn-delete" class="btn btn-success" style="display: none;">삭제</button>
+</div>
+{% endblock top_right_button %}
+
+{% block table_title %}
+{% endblock table_title %}
+
+
+{% block table_content %}
+<table id="table" class="table table-striped jambo_table">
+    <thead>
+    <tr class="headings">
+        <th>
+            <div style="text-align: center;">
+                <input type="checkbox" name="check-all">
+            </div>
+        </th>
+        <th class="column-title">ID</th>
+        <th class="column-title">관리번호</th>
+        <th class="column-title">종류</th>
+        <th class="column-title">모델</th>
+        <th class="column-title">현재 사용자</th>
+        <th class="column-title">구입 날짜</th>
+        <th class="column-title">가격</th>
+        <th class="column-title">상세정보</th>
+        <th class="column-title" style="width:10%;">수정</th>
+    </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </tfoot>
+</table>
+{% endblock table_content %}
+
+{% block custom_js %}
+<script>
+var table;
+$(document).ready(function() {
+
+    table = $('#table').DataTable(
+        {
+            initComplete: function() {
+                this.api().columns([3,5]).every(function() {
+                    var column = this;
+                    var select = $('<select><option value=""></option></select>')
+                        .appendTo( $(column.footer()).empty())
+                        .on('change', function() {
+                            var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                            column.search(val ? '^'+val+'$' : '', true, false).draw();
+                        });
+
+                    column.data().unique().sort().each(function(d, j) {
+                        select.append('<option value="'+d+'">'+d+'</option>');
+                    });
+                });
+            },
+            orderCellsTop: true,
+            ajax: "{% url 'ems:eq_list' %}",
+            columns: [
+                {
+                    data: function(row, type, set) { return '';},
+                    defaultContent: '',
+                    className: 'select-checkbox',
+                    orderable: false
+                },
+                {"data": "id"},
+                {"data": "management_number"},
+                {"data": "kind"},
+                {"data": "model"},
+                {"data": "current_user"},
+                {"data": "purchase_date"},
+                {"data": "price"},
+                {
+                    data: null,
+                    orderable: false,
+                    defaultContent: '<button class="btn btn-success btn-sm btn-detail">상세정보</button>'
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    defaultContent: '<button class="btn btn-success btn-sm btn-modify">수정</button>'
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: [1],
+                    visible: false
+                }
+            ],
+            select: {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+            order: [[1, 'desc']]
+        }
+    );
+
+    // table header 의 첫번째 checkbox 클릭 시 현재 페이지의 모든 row 선택
+    var ckbox = document.querySelector("input[name=check-all]");
+    ckbox.addEventListener( 'change', function() {
+        if(this.checked) {
+            table.rows({page:'current'}).select();
+            $('th.select-checkbox').addClass('selected');
+        }else {
+            table.rows({page:'current'}).deselect();
+            $('th.select-checkbox').removeClass('selected');
+        }
+    });
+
+    // 1개 이상의 row 가 선택될 경우 btn show
+    table.on('select', function(e, dt, type, indexes) {
+        if ($('#table-btn-1').is(":hidden")) {
+            $('#table-btn-1').show();
+        }
+    });
+
+    // row 가 하나도 선택되지 않을 경우 btn hide
+    table.on('deselect', function(e, dt, type, indexes) {
+        var rows = table.rows( { selected: true } ).count();
+        if (rows < 1) {
+            $('#table-btn-1').hide();
+        }
+    });
+
+    // 상세정보 modal
+    $('#table tbody').on('click', 'button.btn-detail', function() {
+        var id = table.row($(this).parents('tr')).data().id;
+        var url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
+        var management_number = table.row($(this).parents('tr')).data().management_number;
+
+        $.get(url)
+            .done(function(obj){
+                var $modal = $('#modal');
+                $modal.find('#modal-title-id').html(management_number);
+                $modal.find('#eq-spec-cpu').html(obj.cpu);
+                $modal.find('#eq-spec-mem').html(obj.mem);
+                $modal.find('#eq-spec-hdd').html(obj.hdd);
+                $modal.find('#eq-spec-nic').html(obj.nic);
+                $modal.find('#eq-spec-graphic').html(obj.graphic);
+                $modal.find('#eq-spec-etc').html(obj.etc);
+                $modal.find('#eq-spec-text').html(obj.text);
+                $modal.modal();
+            })
+            .fail(function(){
+                alert('request failed');
+            });
+    });
+
+    // 추가 modal
+    $('#table-btn-create').on('click', function() {
+        var url = "{% url 'ems:eq_create' %}"
+
+        $.get(url)
+            .done(function(obj) {
+                var $modal = $('#form-modal');
+                $modal.find('form').attr('action', url);
+                $modal.find('.modal-content form').html(obj);
+                $modal.modal();
+            })
+            .fail(function() {
+                alert('request failed');
+            });
+    });
+
+    // 수정 modal
+    $('#table tbody').on('click', 'button.btn-modify', function() {
+        var id = table.row($(this).parents('tr')).data().id;
+        var url = '{% url "ems:eq_update" 9999 %}'.replace(/9999/, id);
+
+        $.get(url)
+            .done(function(obj) {
+                var $modal = $('#form-modal');
+                $modal.find('form').attr('action', url);
+                $modal.find('.modal-content form').html(obj);
+                $modal.modal();
+            })
+            .fail(function() {
+                alert('request failed');
+            });
+    })
+
+    // modal submit 버튼 처리
+    $(document).on('submit', '#form-modal form', function(e) {
+        e.preventDefault();
+        var $form = $(this);
+        var url = $form.attr('action');
+        var data = $form.serialize();
+
+        $.post(url, data)
+        .done(function(html) {
+
+            $resp = $(html)
+
+            // form validation error 가 있는 경우 bad class 가 추가되서 리턴된다.
+            if ($resp.find('.bad').length > 0) {
+                $('#form-modal form').html(html);
+            } else {
+                alert(html);
+                $('#form-modal').modal('hide');
+            }
+        })
+        .fail(function(xhr, textStatus, error) {
+            alert(error);
+        });
+    });
+
+
+
+});
+</script>
+{% endblock custom_js %}

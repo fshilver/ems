@@ -22,9 +22,11 @@
 
         <li><a><i class="fa fa-cogs"></i> 관리자 설정 <span class="fa fa-chevron-down"></span></a>
           <ul class="nav child_menu">
-            <li><a href="#">사용자 등록</a></li>
-            <li><a href="#">장비 등록</a></li>
-            <li><a href="{% url 'accounts:group_list' %}">그룹 관리</a></li>
+            <li><a href="{% url 'accounts:user_list' %}">사용자</a></li>
+            <li><a href="{% url 'accounts:group_list' %}">그룹</a></li>
+            <li><a href="{% url 'ems:eq_list' %}">장비</a></li>
+            <li><a href="{% url 'ems:repair_status_list' %}">수리 상태 라벨</a></li>
+            <li><a href="{% url 'ems:eq_type_list' %}">장비 타입 라벨</a></li>
           </ul>
         </li>
 
@@ -32,7 +34,7 @@
 
         {% if user.is_staff %}
 
-        <li><a><i class="fa fa-cogs"></i> 구성원 관리 <span class="fa fa-chevron-down"></span></a>
+        <li><a><i class="fa fa-cogs"></i> 팀 구성원 관리 <span class="fa fa-chevron-down"></span></a>
           <ul class="nav child_menu">
             <li><a href="{% url 'accounts:signup' %}">구성원 추가 </a></li>
             <li><a href="{% url 'accounts:users_by_group' %}">구성원 정보 </a></li>
@@ -43,8 +45,10 @@
 
         <li><a><i class="fa fa-desktop"></i> 사내 장비 관리 <span class="fa fa-chevron-down"></span></a>
           <ul class="nav child_menu">
-            <li><a href="#">장비 신청하기</a></li>
-            <li><a href="#">사용중인 장비 목록</a></li>
+            <li><a href="{% url 'ems:usable_eq_list' %}">장비 사용 신청하기</a></li>
+            <li><a href="{% url 'ems:used_eq_list' %}">사용 중인 장비 목록</a></li>
+            <li><a href="{% url 'ems:apply_eq_list' %}">사용 신청한 장비 목록</a></li>
+            <li><a href="{% url 'ems:return_eq_list' %}">반납 신청한 장비 목록</a></li>
           </ul>
         </li>
 

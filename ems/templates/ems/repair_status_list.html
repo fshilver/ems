@@ -1,0 +1,165 @@
+{% extends "_list_as_table.html" %}
+
+{% block title %}
+수리 상태 라벨 목록
+{% endblock title %}
+
+
+{% block top_right_button %}
+<div class="form-group pull-right top_search">
+    <button id="table-btn-create" class="btn btn-success">추가</a>
+    <button id="table-btn-delete" class="btn btn-success" style="display: none;">삭제</button>
+</div>
+{% endblock top_right_button %}
+
+{% block table_title %}
+{% endblock table_title %}
+
+
+{% block table_content %}
+<table id="table" class="table table-striped jambo_table">
+    <thead>
+    <tr class="headings">
+        <th>
+            <div style="text-align: center;">
+                <input type="checkbox" name="check-all">
+            </div>
+        </th>
+        <th class="column-title">ID</th>
+        <th class="column-title">수리 상태 라벨</th>
+        <th class="column-title" style="width:10%;">수정</th>
+    </tr>
+    </thead>
+</table>
+{% endblock table_content %}
+
+
+{% block custom_js %}
+<script>
+var table;
+$(document).ready(function() {
+
+    table = $('#table').DataTable(
+        {
+            ajax: "{% url 'ems:repair_status_list' %}",
+            columns: [
+                {
+                    data: function(row, type, set) { return '';},
+                    defaultContent: '',
+                    className: 'select-checkbox',
+                    orderable: false
+                },
+                {"data": "id"},
+                {"data": "label"},
+                {
+                    data: null,
+                    orderable: false,
+                    defaultContent: '<button class="btn btn-success btn-sm">수정</button>'
+                }
+            ],
+            select: {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+            order: [[1, 'desc']]
+        }
+    );
+
+    // 추가 버튼 (form-modal)
+    $('#table-btn-create').on('click', function() {
+        var url = "{% url 'ems:repair_status_create' %}"
+        $.get(url)
+        .done(function(obj){
+            var $modal = $('#form-modal');
+            $modal.find('form').attr("action", url);
+            $modal.find('.modal-content form').html(obj);
+            $modal.modal();
+        })
+        .fail(function() {
+            alert("Modal 생성 실패");
+        })
+    });
+
+    // 수정 버튼 (form-modal)
+    $('#table tbody').on('click', 'button', function() {
+        var id = table.row($(this).parents('tr')).data().id;
+        var url = "{% url 'ems:repair_status_update' 9999 %}".replace(/9999/, id);
+
+        $.get(url)
+            .done(function(obj){
+                var $modal = $('#form-modal');
+                $modal.find('form').attr("action", url);
+                $modal.find('.modal-content form').html(obj);
+                $modal.modal();
+            })
+            .fail(function(){
+                alert('request failed');
+            });
+    });
+
+    // 삭제 버튼
+    $('#table-btn-delete').on('click', function() {
+        var eq_list = [];
+        $.each(table.rows('.selected').data(), function(index, element) {
+            eq_list.push(element.id);
+        });
+
+        $.ajax({
+            type: 'POST'
+            ,url: "{% url 'ems:delete_repair_status_ajax' %}"
+            ,data: {
+                'ids' : eq_list
+            }
+            ,dataType: 'json'
+            ,success: function(data) {
+                new PNotify({
+                    title: 'Success',
+                    text: data['message'],
+                    type: 'success',
+                    styling: 'bootstrap3'
+                });
+                table.ajax.reload();
+            }
+            ,error: function(error) {
+                new PNotify({
+                    title: 'Error',
+                    text: error,
+                    type: 'error',
+                    styling: 'bootstrap3'
+                });
+            }
+        });
+    });
+
+    // table header 의 첫번째 checkbox 클릭 시 현재 페이지의 모든 row 선택
+    var ckbox = document.querySelector("input[name=check-all]");
+    ckbox.addEventListener( 'change', function() {
+        if(this.checked) {
+            table.rows({page:'current'}).select();
+            $('th.select-checkbox').addClass('selected');
+        }else {
+            table.rows({page:'current'}).deselect();
+            $('th.select-checkbox').removeClass('selected');
+        }
+    });
+
+    // 1개 이상의 row 가 선택될 경우 btn show
+    table.on('select', function(e, dt, type, indexes) {
+        if ($('#table-btn-delete').is(":hidden")) {
+            $('#table-btn-delete').show();
+        }
+    });
+
+    // row 가 하나도 선택되지 않을 경우 btn hide
+    table.on('deselect', function(e, dt, type, indexes) {
+        var rows = table.rows( { selected: true } ).count();
+        if (rows < 1) {
+            $('#table-btn-delete').hide();
+        }
+    });
+
+});
+</script>
+{% endblock custom_js %}
+
+

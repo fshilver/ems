@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig',
+    'ems.apps.EmsConfig',
 ]
 
 MIDDLEWARE = [
@@ -132,7 +134,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_URL = '/accounts/login/' # 기본값
 LOGOUT_URL = '/accounts/logout/' # 기본값
-LOGIN_REDIRECT_URL = '/' # 반드시 정의할 것!
+LOGIN_REDIRECT_URL = reverse_lazy('ems:used_eq_list') # 반드시 정의할 것!
 
 # logout 에는 별도의 view 를 사용하지 않는다.
 # logout 이 후 / 로 이동하면, login 이 안되어 있기 때문에 LOGIN_URL 로 다시 redirec 된다.
