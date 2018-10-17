@@ -34,10 +34,29 @@ class CustomUserChangeForm(UserChangeForm):
 
     class Meta:
         model = get_user_model()
-        fields = ('email', 'name', 'is_active', 'is_superuser', 'is_staff')
+        fields = ('name', 'password', 'is_active', 'is_staff')
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'password': forms.HiddenInput(attrs={'class': 'form-control'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'flat'}),
+            'is_staff': forms.CheckboxInput(attrs={'class': 'flat'}),
+        }
 
 
-class SigninForm(forms.ModelForm):
+class UserUpdateForm(forms.ModelForm):
+
+    class Meta:
+        model = get_user_model()
+        fields = ('name', 'is_active', 'is_staff')
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'flat'}),
+            'is_staff': forms.CheckboxInput(attrs={'class': 'flat'}),
+        }
+
+
+
+class SignUpForm(forms.ModelForm):
 
     field_order = ('email', 'name', 'password1', 'password2', 'is_active', 'is_staff', 'groups')
 
@@ -97,7 +116,7 @@ class SigninForm(forms.ModelForm):
         self.object.groups.add(form.cleaned_data['groups'])
 
     def save(self, commit=True):
-        user = super(SigninForm, self).save(commit=False)
+        user = super(SignUpForm, self).save(commit=False)
 
         user.set_password(self.cleaned_data["password1"])
         if commit:

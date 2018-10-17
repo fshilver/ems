@@ -1,9 +1,15 @@
+from django.http import JsonResponse, HttpResponse
 from django.views.generic import ListView, CreateView, DeleteView, UpdateView
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
-from .forms import SigninForm, LoginForm
 from django.contrib.auth.views import LoginView
+from .forms import (
+    SignUpForm,
+    LoginForm,
+    CustomUserChangeForm,
+    UserUpdateForm,
+)
 
 class CustomLoginView(LoginView):
     authentication_form = LoginForm
@@ -36,13 +42,29 @@ class UserListView(ListView):
     model = get_user_model()
     template_name = "accounts/user_list.html"
 
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            data = []
+            for obj in self.object_list:
+                user = {
+                    'id': obj.id,
+                    'email': obj.email,
+                    'name': obj.name,
+                    'is_active': obj.is_active,
+                    'is_staff': obj.is_staff,
+                }
+                data.append(user)
+
+            return JsonResponse({"data": data})
+        return super().render_to_response(context)
+
 
 class UserSignUpView(CreateView):
     '''
     팀 관리자(is_staff=True) 가 사용하는 user create view
     '''
     model = get_user_model()
-    form_class = SigninForm
+    form_class = SignUpForm
     template_name = "accounts/user_form.html"
     success_url = reverse_lazy('accounts:users_by_group')
 
@@ -57,19 +79,41 @@ class UserCreateView(CreateView):
     superuser 가 사용하는 user create view
     '''
     model = get_user_model()
-    form_class = SigninForm
+    form_class = SignUpForm
     template_name = "accounts/user_create.html"
     success_url = reverse_lazy('accounts:user_list')
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return ['accounts/user_modal_form.html']
+        return super().get_template_names()
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.is_ajax():
+            return HttpResponse("성공")
+        return response
 
 
 class UserUpdateView(UpdateView):
-    '''
+    """
     superuser 가 사용하는 user update view
-    '''
+    """
     model = get_user_model()
-    form_class = SigninForm
+    form_class = UserUpdateForm
     template_name = "accounts/user_create.html"
     success_url = reverse_lazy('accounts:user_list')
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return ['accounts/user_modal_form.html']
+        return super().get_template_names()
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.is_ajax():
+            return HttpResponse("성공")
+        return response
 
 
 class UserDeleteView(DeleteView):
