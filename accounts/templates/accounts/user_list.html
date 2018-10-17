@@ -10,7 +10,6 @@
     <button id="table-btn-create" class="btn btn-success">추가</button>
     <button id="table-btn-activate" class="btn btn-success" style="display: none;">활성화</button>
     <button id="table-btn-deactivate" class="btn btn-success" style="display: none;">비활성화</button>
-    <button id="table-btn-delete" class="btn btn-success" style="display: none;">삭제</button>
 </div>
 {% endblock top_right_button %}
 
@@ -120,9 +119,6 @@ $(document).ready(function() {
 
     // 1개 이상의 row 가 선택될 경우 btn show
     table.on('select', function(e, dt, type, indexes) {
-        if ($('#table-btn-delete').is(":hidden")) {
-            $('#table-btn-delete').show();
-        }
         if ($('#table-btn-activate').is(":hidden")) {
             $('#table-btn-activate').show();
         }
@@ -135,7 +131,6 @@ $(document).ready(function() {
     table.on('deselect', function(e, dt, type, indexes) {
         var rows = table.rows( { selected: true } ).count();
         if (rows < 1) {
-            $('#table-btn-delete').hide();
             $('#table-btn-activate').hide();
             $('#table-btn-deactivate').hide();
         }

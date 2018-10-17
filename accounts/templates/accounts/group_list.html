@@ -17,27 +17,57 @@
 
 
 {% block table_content %}
-<table class="table table-striped jambo_table">
+<table id="table" class="table table-striped jambo_table">
     <thead>
     <tr class="headings">
+        <th>
+            <div style="text-align: center;">
+                <input type="checkbox" name="check-all">
+            </div>
+        </th>
         <th class="column-title">ID</th>
         <th class="column-title">이름</th>
         <th class="column-title" style="width:10%;">수정</th>
-        <th class="column-title" style="width:10%;">삭제</th>
     </tr>
     </thead>
-
-    <tbody>
-    {% for group in object_list %}
-    
-    <tr class="{% cycle 'even' 'odd' %} pointer">
-        <td>{{ group.id }}</a></td>
-        <td>{{ group.name }} </td>
-        <td><a class="btn btn-success btn-xs" href="{% url 'accounts:group_update' group.id %}">수정</a></td>
-        <td><a class="btn btn-success btn-xs" href="{% url 'accounts:group_delete' group.id %}">삭제</a></td>
-    </tr>
-
-    {% endfor %}
-    </tbody>
 </table>
 {% endblock table_content %}
+
+{% block custom_js %}
+<script>
+var table;
+$(document).ready(function() {
+
+    table = $('#table').DataTable({
+            ajax: "{% url 'accounts:group_list' %}",
+            columns: [
+                {
+                    data: function(row, type, set) { return '';},
+                    defaultContent: '',
+                    className: 'select-checkbox',
+                    orderable: false
+                },
+                {"data": "id"},
+                {"data": "name"},
+                {
+                    data: null,
+                    orderable: false,
+                    defaultContent: '<button class="btn btn-success btn-sm btn-modify">수정</button>'
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: [1],
+                    visible: false
+                }
+            ],
+            select: {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+            order: [[1, 'desc']]
+    });
+
+});
+</script>
+{% endblock custom_js %}

@@ -129,6 +129,18 @@ class GroupListView(ListView):
     model = Group
     template_name = "accounts/group_list.html"
 
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            data = []
+            for obj in self.object_list:
+                group = {
+                    'id': obj.id,
+                    'name': obj.name,
+                }
+                data.append(group)
+            return JsonResponse({'data': data})
+        return super().render_to_response(context)
+
 
 class GroupCreateView(CreateView):
     model = Group
