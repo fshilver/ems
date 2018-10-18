@@ -45,6 +45,13 @@ class CustomUserChangeForm(UserChangeForm):
 
 class UserUpdateForm(forms.ModelForm):
 
+    groups = forms.ModelMultipleChoiceField(
+        label='소속 사업부',
+        queryset=Group.objects.all(),
+        required=True,
+        widget=forms.SelectMultiple(attrs={'class': 'select2_multiple form-control'}),
+    )
+
     class Meta:
         model = get_user_model()
         fields = ('name', 'is_active', 'is_staff')
@@ -58,6 +65,21 @@ class UserUpdateForm(forms.ModelForm):
             'is_active': forms.CheckboxInput(attrs={'class': 'flat'}),
             'is_staff': forms.CheckboxInput(attrs={'class': 'flat'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+        if instance is not None:
+            initial = kwargs.get('initial', {})
+            initial['groups'] = instance.groups.all()
+            kwargs['initial'] = initial
+        return super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if commit:
+            user.save()
+            user.groups.set(self.cleaned_data['groups'])
+        return user
 
 
 

@@ -70,6 +70,26 @@
 
     </div><!-- form-group -->
 
+
+
+    {% if form.groups.errors %}
+    <div class="item form-group bad">  <!-- error 가 있는 경우 item, bad class 추가 -->
+    {% else %}
+    <div class="form-group">
+    {% endif %}
+
+        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.groups.name }}">
+        {{ form.groups.label }} {% if form.groups.field.required %}<span class="required">(*)</span>{% endif %}
+        </label>
+        <div class="col-md-6 col-sm-6 col-xs-12">
+            {{ form.groups }}
+        </div>
+        {% for error in form.groups.errors %} <!-- error 메시지 출력 -->
+        <div class="alert">{{ error|escape }}</div>
+        {% endfor %}
+
+    </div><!-- form-group -->
+
 </div><!-- modal-body -->
 
 
