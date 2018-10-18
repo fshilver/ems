@@ -48,6 +48,11 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = ('name', 'is_active', 'is_staff')
+        labels = {
+            'name': '이름',
+            'is_active': '활성화',
+            'is_staff': '팀 관리자',
+        }
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'flat'}),

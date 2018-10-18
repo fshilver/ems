@@ -8,36 +8,68 @@
 
 <div class="modal-body">
 
-    {% for field in form %}
+    {% if form.name.errors %}
+    <div class="item form-group bad">  <!-- error 가 있는 경우 item, bad class 추가 -->
+    {% else %}
+    <div class="form-group">
+    {% endif %}
 
-        {% if field.errors %}
+        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.name.name }}">
+        {{ form.name.label }} {% if form.name.field.required %}<span class="required">(*)</span>{% endif %}
+        </label>
+        <div class="col-md-6 col-sm-6 col-xs-12">
+        {{ form.name }}
+        </div>
+        {% for error in form.name.errors %} <!-- error 메시지 출력 -->
+        <div class="alert">{{ error|escape }}</div>
+        {% endfor %}
 
-            <div class="item form-group bad">  <!-- error 가 있는 경우 item, bad class 추가 -->
-                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ field.name }}">
-                {{ field.label }} {% if field.field.required %}<span class="required">(*)</span>{% endif %}
-                </label>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                {{ field }}
-                </div>
-                {% for error in field.errors %} <!-- error 메시지 출력 -->
-                <div class="alert">{{ error|escape }}</div>
-                {% endfor %}
+    </div><!-- form-group -->
+
+
+
+    {% if form.is_active.errors %}
+    <div class="item form-group bad">  <!-- error 가 있는 경우 item, bad class 추가 -->
+    {% else %}
+    <div class="form-group">
+    {% endif %}
+
+        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.is_active.name }}">
+        {{ form.is_active.label }} {% if form.is_active.field.required %}<span class="required">(*)</span>{% endif %}
+        </label>
+        <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="checkbox">
+                <label>{{ form.is_active }}</label>
             </div>
-        
-        {% else %}
+        </div>
+        {% for error in form.is_active.errors %} <!-- error 메시지 출력 -->
+        <div class="alert">{{ error|escape }}</div>
+        {% endfor %}
 
-            <div class="form-group">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ field.name }}">
-                {{ field.label }} {% if field.field.required %}<span class="required">(*)</span>{% endif %}
-                </label>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                {{ field }}
-                </div>
+    </div><!-- form-group -->
+
+
+
+    {% if form.is_staff.errors %}
+    <div class="item form-group bad">  <!-- error 가 있는 경우 item, bad class 추가 -->
+    {% else %}
+    <div class="form-group">
+    {% endif %}
+
+        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="{{ form.is_staff.name }}">
+        {{ form.is_staff.label }} {% if form.is_staff.field.required %}<span class="required">(*)</span>{% endif %}
+        </label>
+        <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="checkbox">
+                <label>{{ form.is_staff }}</label>
             </div>
+        </div>
+        {% for error in form.is_staff.errors %} <!-- error 메시지 출력 -->
+        <div class="alert">{{ error|escape }}</div>
+        {% endfor %}
 
-        {% endif %}
+    </div><!-- form-group -->
 
-    {% endfor %}
 </div><!-- modal-body -->
 
 
