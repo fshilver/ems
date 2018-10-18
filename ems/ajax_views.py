@@ -3,6 +3,7 @@ from django.http import (
     HttpResponse,
     HttpResponseNotAllowed,
 )
+from django.shortcuts import get_object_or_404
 from .models import Equipment, RepairStatus, EquipmentType
 
 ####################################
@@ -88,6 +89,22 @@ def reject_return_eq(request):
     """
     return update_equipment_status(request, Equipment.USED)
 
+
+def change_status_eq(request):
+    if request.method == 'POST':
+        status = request.POST.get('status_code', None)
+        if status is None:
+            return JsonResponse({'error': 'invalid status code'})
+
+        ids = request.POST.getlist('ids[]')
+        for id in ids:
+            eq = get_object_or_404(Equipment, pk=id)
+            eq.status = status
+            eq.save()
+
+        return JsonResponse({'message': '상태 변경 성공'})
+
+    return JsonResponse({'error': '{} is unsupported method'.format(request.method)})
 
 
 ####################################

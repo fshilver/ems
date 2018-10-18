@@ -6,10 +6,19 @@
 
 
 {% block top_right_button %}
-<div class="form-group pull-right top_search">
-    <button id="table-btn-create" class="btn btn-success">추가</button>
-    <button id="table-btn-delete" class="btn btn-success" style="display: none;">삭제</button>
-</div>
+    <div class="col-sm-10">
+        <div id="eq-status-input-group" class="input-group" style="display: none;">
+            <span class="input-group-btn"><button id="eq-status-change-btn" class="btn btn-success">상태 변경</button></span>
+            <select id="eq-status" class="form-control">
+                {% for value, name in status_list %}
+                <option value="{{ value }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="col-sm-2">
+        <button id="table-btn-create" class="btn btn-success btn-block">추가</button>
+    </div>
 {% endblock top_right_button %}
 
 {% block table_title %}
@@ -29,15 +38,17 @@
         <th class="column-title">관리번호</th>
         <th class="column-title">종류</th>
         <th class="column-title">모델</th>
+        <th class="column-title">상태</th>
         <th class="column-title">현재 사용자</th>
         <th class="column-title">구입 날짜</th>
         <th class="column-title">가격</th>
-        <th class="column-title">상세정보</th>
-        <th class="column-title" style="width:10%;">수정</th>
+        <th class="column-title" style="width:5%;">상세정보</th>
+        <th class="column-title" style="width:5%;">수정</th>
     </tr>
     </thead>
     <tfoot>
         <tr>
+            <th></th>
             <th></th>
             <th></th>
             <th></th>
@@ -61,7 +72,7 @@ $(document).ready(function() {
     table = $('#table').DataTable(
         {
             initComplete: function() {
-                this.api().columns([3,5]).every(function() {
+                this.api().columns([3,5,6]).every(function() {
                     var column = this;
                     var select = $('<select><option value=""></option></select>')
                         .appendTo( $(column.footer()).empty())
@@ -88,6 +99,7 @@ $(document).ready(function() {
                 {"data": "management_number"},
                 {"data": "kind"},
                 {"data": "model"},
+                {"data": "status"},
                 {"data": "current_user"},
                 {"data": "purchase_date"},
                 {"data": "price"},
@@ -130,8 +142,8 @@ $(document).ready(function() {
 
     // 1개 이상의 row 가 선택될 경우 btn show
     table.on('select', function(e, dt, type, indexes) {
-        if ($('#table-btn-1').is(":hidden")) {
-            $('#table-btn-1').show();
+        if ($('#eq-status-input-group').is(":hidden")) {
+            $('#eq-status-input-group').show();
         }
     });
 
@@ -139,7 +151,7 @@ $(document).ready(function() {
     table.on('deselect', function(e, dt, type, indexes) {
         var rows = table.rows( { selected: true } ).count();
         if (rows < 1) {
-            $('#table-btn-1').hide();
+            $('#eq-status-input-group').hide();
         }
     });
 
@@ -194,6 +206,49 @@ $(document).ready(function() {
                 alert('request failed');
             });
     })
+
+    // 상태 변경 btn
+    $('#eq-status-change-btn').on('click', function() {
+        var id_list = [];
+        $.each(table.rows({selected: true}).data(), function(index, element) {
+            id_list.push(element.id);
+        });
+
+        if (id_list.length == 0) {
+            return;
+        }
+
+        var status_code = $('#eq-status').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "ems:change_status_eq_ajax" %}',
+            data: {
+                'ids': id_list,
+                'status_code': status_code
+            },
+            dataType: 'json',
+            success: function(data) {
+                table.ajax.reload();
+                new PNotify({
+                    title: 'Success',
+                    text: data['message'],
+                    type: 'success',
+                    styling: 'bootstrap3'
+                });
+                $('#eq-status-input-group').hide();
+            },
+            error: function(error) {
+                new PNotify({
+                    title: 'Error',
+                    text: error,
+                    type: 'error',
+                    styling: 'bootstrap3'
+                });
+            }
+
+        });
+    });
 
     // modal submit 버튼 처리
     $(document).on('submit', '#form-modal form', function(e) {

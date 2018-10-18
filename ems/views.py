@@ -124,6 +124,11 @@ class EquipmentListView(ListView):
     model = Equipment
     template_name = 'ems/eq_list.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status_list'] = Equipment.STATUS
+        return context
+
     def render_to_response(self, context):
         if self.request.is_ajax():
             data = []
@@ -148,6 +153,7 @@ class EquipmentListView(ListView):
                     'current_user': current_user_name,
                     'purchase_requester': purchase_requester_name,
                     'price': obj.price,
+                    'status': obj.get_status_display(),
                 }
                 data.append(eq)
             return JsonResponse({"data":data})

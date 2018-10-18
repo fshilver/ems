@@ -35,6 +35,7 @@ from .ajax_views import (
     reject_return_eq,
     delete_repair_status,
     delete_equipment_type,
+    change_status_eq,
 )
 
 urlpatterns = [
@@ -91,6 +92,9 @@ urlpatterns = [
     path('eq/create/', EquipmentCreateView.as_view(), name='eq_create'),
     path('eq/update/<int:pk>', EquipmentUpdateView.as_view(), name='eq_update'),
     path('eq/delete/<int:pk>', EquipmentDeleteView.as_view(), name='eq_delete'),
+
+    # 장비 상태 변경
+    path('eq/change_status/', change_status_eq, name='change_status_eq_ajax'),
 
     path('eq_spec/update/<int:pk>/', EquipmentSpecUpdateView.as_view(), name='eq_spec_update'),
     path('eq_spec/<int:pk>/', EquipmentSpecDetailView.as_view(), name='eq_spec_detail'),
