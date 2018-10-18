@@ -6,9 +6,9 @@
 
 
 {% block top_right_button %}
-{% comment %} <div class="col-md-2 col-sm-2 col-xs-12 form-group pull-right top_search"> {% endcomment %}
 <div class="form-group pull-right top_search">
-    <a class="btn btn-success" href="{% url 'accounts:group_create' %}">그룹 추가</a>
+    <button id="table-btn-create" class="btn btn-success">추가</button>
+    <button id="table-btn-delete" class="btn btn-success" style="display: none;">삭제</button>
 </div>
 {% endblock top_right_button %}
 
@@ -66,6 +66,131 @@ $(document).ready(function() {
                 selector: 'td:first-child'
             },
             order: [[1, 'desc']]
+    });
+
+    // table header 의 첫번째 checkbox 클릭 시 현재 페이지의 모든 row 선택
+    var ckbox = document.querySelector("input[name=check-all]");
+    ckbox.addEventListener( 'change', function() {
+        if(this.checked) {
+            table.rows({page:'current'}).select();
+            $('th.select-checkbox').addClass('selected');
+        }else {
+            table.rows({page:'current'}).deselect();
+            $('th.select-checkbox').removeClass('selected');
+        }
+    });
+
+    // 1개 이상의 row 가 선택될 경우 btn show
+    table.on('select', function(e, dt, type, indexes) {
+        if ($('#table-btn-delete').is(":hidden")) {
+            $('#table-btn-delete').show();
+        }
+    });
+
+    // row 가 하나도 선택되지 않을 경우 btn hide
+    table.on('deselect', function(e, dt, type, indexes) {
+        var rows = table.rows( { selected: true } ).count();
+        if (rows < 1) {
+            $('#table-btn-delete').hide();
+            $('#table-btn-delete').hide();
+        }
+    });
+
+    // 삭제
+    $('#table-btn-delete').on('click', function() {
+        var group_id_list = [];
+        $.each(table.rows({selected: true}).data(), function(index, element) {
+            group_id_list.push(element.id);
+        });
+
+        if ( group_id_list.length == 0) {
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "accounts:delete_group_ajax" %}',
+            data: {
+                'ids': group_id_list
+            },
+            dataType: 'json',
+            success: function(data) {
+                table.ajax.reload();
+                new PNotify({
+                    title: "Success",
+                    text: data['message'],
+                    type: 'success',
+                    styling: 'bootstrap3'
+                });
+            },
+            fail: function(error) {
+                new PNotify({
+                    title: "Error",
+                    text: error,
+                    type: 'error',
+                    styling: 'bootstrap3'
+                });
+            }
+        });
+    });
+
+    // 수정 modal
+    $('#table tbody').on('click', 'button.btn-modify', function() {
+        var id = table.row($(this).parents('tr')).data().id;
+        var url = '{% url "accounts:group_update" 9999 %}'.replace(/9999/, id);
+
+        $.get(url)
+            .done(function(obj) {
+                var $modal = $('#form-modal');
+                $modal.find('form').attr('action', url);
+                $modal.find('.modal-content form').html(obj);
+                $modal.modal();
+            })
+            .fail(function() {
+                alert('request failed');
+            });
+    });
+
+    // 추가 modal
+    $('#table-btn-create').on('click', function() {
+        var url = "{% url 'accounts:group_create' %}"
+
+        $.get(url)
+        .done(function(obj) {
+            var $modal = $('#form-modal');
+            $modal.find('form').attr('action', url);
+            $modal.find('#form-modal-title-id').html("그룹 추가!!!");
+            $modal.find('.modal-content form').html(obj);
+            $modal.modal();
+        })
+        .fail(function() {
+            alert('request failed');
+        });
+    });
+
+    // modal submit 버튼 처리
+    $(document).on('submit', '#form-modal form', function(e) {
+        e.preventDefault();
+        var $form = $(this);
+        var url = $form.attr('action');
+        var data = $form.serialize();
+
+        $.post(url, data)
+        .done(function(html) {
+
+            $resp = $(html)
+
+            // form validation error 가 있는 경우 bad class 가 추가되서 리턴된다.
+            if ($resp.find('.bad').length > 0) {
+                $('#form-modal form').html(html);
+            } else {
+                table.ajax.reload();
+                $('#form-modal').modal('hide');
+            }
+        })
+        .fail(function(xhr, textStatus, error) {
+            alert(error);
+        });
     });
 
 });

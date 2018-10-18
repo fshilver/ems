@@ -176,6 +176,10 @@ $(document).ready(function() {
             user_id_list.push(element.id);
         });
 
+        if ( user_id_list.length == 0) {
+            return;
+        }
+
         $.ajax({
             type: 'POST',
             url: '{% url "accounts:activate_users" %}',
@@ -209,6 +213,10 @@ $(document).ready(function() {
         $.each(table.rows({selected: true}).data(), function(index, element) {
             user_id_list.push(element.id);
         });
+
+        if ( user_id_list.length == 0) {
+            return;
+        }
 
         $.ajax({
             type: 'POST',
@@ -254,7 +262,6 @@ $(document).ready(function() {
                 $('#form-modal form').html(html);
             } else {
                 table.ajax.reload();
-                alert(html);
                 $('#form-modal').modal('hide');
             }
         })

@@ -148,9 +148,22 @@ class GroupCreateView(CreateView):
     success_url = reverse_lazy('accounts:group_list')
     fields = ('name',)
 
-    def get_context_data(self, **kwargs):
-        cx = super().get_context_data(**kwargs)
-        return cx
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=None)
+        for field in form.fields:
+            form.fields[field].widget.attrs.update({'class': 'form-control'})
+        return form
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return ['modal_form.html']
+        return super().get_template_names()
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.is_ajax():
+            return HttpResponse("성공")
+        return response
 
 
 class GroupDeleteView(DeleteView):
@@ -164,3 +177,20 @@ class GroupUpdateView(UpdateView):
     fields = ('name',)
     template_name = "accounts/group_form.html"
     success_url = reverse_lazy('accounts:group_list')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=None)
+        for field in form.fields:
+            form.fields[field].widget.attrs.update({'class': 'form-control'})
+        return form
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return ['modal_form.html']
+        return super().get_template_names()
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.is_ajax():
+            return HttpResponse("성공")
+        return response
