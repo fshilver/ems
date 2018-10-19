@@ -24,6 +24,7 @@ from .views import (
     ReturnEquipmentListView,
     ReturnEquipmentAcceptView,
     ReturnEquipmentRejectView,
+    EquipmentHistoryListView,
 )
 
 from .ajax_views import (
@@ -98,4 +99,7 @@ urlpatterns = [
 
     path('eq_spec/update/<int:pk>/', EquipmentSpecUpdateView.as_view(), name='eq_spec_update'),
     path('eq_spec/<int:pk>/', EquipmentSpecDetailView.as_view(), name='eq_spec_detail'),
+
+    # 장비 대여/반납 이력
+    path('eq_history/<int:eq_id>/', EquipmentHistoryListView.as_view(), name='eq_history_list'),
 ]

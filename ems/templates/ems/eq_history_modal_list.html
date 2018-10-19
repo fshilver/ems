@@ -1,0 +1,29 @@
+<table class="table table-striped">
+  <thead>
+    <tr class="headings">
+      <th class="column-title">반출일</th>
+      <th class="column-title">사용자</th>
+      <th class="column-title">목적</th>
+      <th class="column-title">반납예정일</th>
+      <th class="column-title">관리자승인</th>
+      <th class="column-title">반납확인</th>
+      <th class="column-title">비고</th>
+      <th class="column-title">Count</th>
+    </tr>
+  </thead>
+
+  <tbody>
+      {% for obj in object_list %}
+      <tr class="{% cycle 'odd' 'even' %}">
+          <td>{{ obj.check_out_date }}</td>
+          <td>{{ obj.user.name }}</td>
+          <td>{{ obj.purpose }}</td>
+          <td>{{ obj.check_in_duedate }}</td>
+          <td>{{ obj.manager_confirm }}</td>
+          <td>{{ obj.check_in_confirm }}</td>
+          <td>{{ obj.note }}</td>
+          <td>{{ obj.count }}</td>
+      </tr>
+      {% endfor %}
+  </tbody>
+</table>

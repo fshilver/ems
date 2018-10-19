@@ -7,6 +7,7 @@ from .models import (
     EquipmentType,
     Equipment,
     EquipmentSpec,
+    EquipmentHistory,
 )
 from .forms import (
     EquipmentSpecForm,
@@ -478,3 +479,19 @@ class EquipmentSpecDetailView(DetailView):
         eq = Equipment.objects.get(pk=pk)
         return EquipmentSpec.objects.filter(equipment__exact=eq).order_by('-count').first()
 
+
+
+####################################
+# History
+####################################
+class EquipmentHistoryListView(ListView):
+    model = EquipmentHistory
+    template_name = 'ems/eq_history_modal_list.html'
+
+    def get_queryset(self):
+        eq = Equipment.objects.get(pk=self.kwargs['eq_id'])
+        if eq is None: # TODO: 제대로 된 에러처리 필요, 404 같은걸 리턴해야 할 듯
+            return None
+        
+        return EquipmentHistory.objects.filter(equipment__exact=eq)
+        
