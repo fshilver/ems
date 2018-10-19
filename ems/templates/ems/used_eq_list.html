@@ -141,25 +141,19 @@ $(document).ready(function() {
     // 상세정보 Modal
     $('#eq-list tbody').on('click', 'button', function() {
         var id = table.row($(this).parents('tr')).data().id;
-        var detail_url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
+        var url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
         var management_number = table.row($(this).parents('tr')).data().management_number;
 
-        $.get(detail_url)
-        .done(function(obj){
-            var $modal = $('#modal');
-            $modal.find('#modal-title-id').html(management_number);
-            $modal.find('#eq-spec-cpu').html(obj.cpu);
-            $modal.find('#eq-spec-mem').html(obj.mem);
-            $modal.find('#eq-spec-hdd').html(obj.hdd);
-            $modal.find('#eq-spec-nic').html(obj.nic);
-            $modal.find('#eq-spec-graphic').html(obj.graphic);
-            $modal.find('#eq-spec-etc').html(obj.etc);
-            $modal.find('#eq-spec-text').html(obj.text);
-            $modal.modal();
-        })
-        .fail(function(){
-            alert('request failed');
-        })
+        $.get(url)
+            .done(function(obj){
+                var $modal = $('#modal-list');
+                $modal.find('#modal-title-id').html(management_number + ' 상세 정보');
+                $modal.find('.modal-body').html(obj);
+                $modal.modal();
+            })
+            .fail(function(){
+                alert('request failed');
+            });
     });
 });
 </script>

@@ -1,0 +1,50 @@
+<table class="table table-striped">
+  <thead>
+    <tr class="headings">
+      <th class="column-title">항목</th>
+      <th class="column-title">내용</th>
+    </tr>
+  </thead>
+
+  <tbody>
+      <tr>
+          <th>CPU</th><td>{{ object.cpu }}</td>
+      </tr>
+      <tr>
+          <th>Memory</th><td>{{ object.mem }}</td>
+      </tr>
+      <tr>
+          <th>HDD</th><td>{{ object.hdd }}</td>
+      </tr>
+      <tr>
+          <th>NIC</th><td>{{ object.nic }}</td>
+      </tr>
+      <tr>
+          <th>Graphic</th><td>{{ object.graphic }}</td>
+      </tr>
+      <tr>
+          <th>Etc</th><td>{{ object.etc }}</td>
+      </tr>
+      <tr>
+          <th>Text</th><td>{{ object.text }}</td>
+      </tr>
+      <tr>
+          <th>수정 날짜</th><td>{{ object.change_date }}</td>
+      </tr>
+      <tr>
+          <th>수정 이유</th><td>{{ object.change_reason }}</td>
+      </tr>
+      <tr>
+          <th>비용</th><td>{{ object.cost }}</td>
+      </tr>
+      <tr>
+          <th>수정한 사람</th><td>{{ object.change_user.name }}</td>
+      </tr>
+      <tr>
+          <th>참고문서</th><td>{{ object.reference }}</td>
+      </tr>
+      <tr>
+          <th>수정 횟수</th><td>{{ object.count }}</td>
+      </tr>
+  </tbody>
+</table>

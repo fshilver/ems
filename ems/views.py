@@ -457,26 +457,12 @@ class EquipmentSpecUpdateView(UpdateView):
 
 class EquipmentSpecDetailView(DetailView):
     model = EquipmentSpec
-    template_name = 'ems/eq_spec_detail.html'
-
-    def render_to_response(self, context):
-        if self.request.is_ajax():
-            return  JsonResponse({
-                'cpu': self.object.cpu,
-                'mem': self.object.mem,
-                'hdd': self.object.hdd,
-                'nic': self.object.nic,
-                'graphic': self.object.graphic,
-                'etc': self.object.etc,
-                'text': self.object.text,
-            })
-
-        # template rendering
-        return super().render_to_response(context)
+    template_name = 'ems/eq_spec_modal_detail.html'
 
     def get_object(self):
-        pk = self.kwargs.get('pk')
-        eq = Equipment.objects.get(pk=pk)
+        eq = Equipment.objects.get(pk=self.kwargs.get('pk', None))
+        if eq is None: # TODO: 제대로 된 에러처리 필요, 404 리턴
+            return None
         return EquipmentSpec.objects.filter(equipment__exact=eq).order_by('-count').first()
 
 
