@@ -1,10 +1,18 @@
+from django.db import transaction
 from django.http import (
     JsonResponse,
     HttpResponse,
     HttpResponseNotAllowed,
 )
 from django.shortcuts import get_object_or_404
-from .models import Equipment, RepairStatus, EquipmentType
+from .models import (
+    Equipment,
+    RepairStatus,
+    EquipmentType,
+    EquipmentApply,
+    EquipmentHistory,
+)
+import json
 
 ####################################
 # Equipment
@@ -52,9 +60,42 @@ def apply_use_eq(request):
 def accept_use_eq(request):
     """
     장비 사용 신청 승인
-    신청 승인 시 Equipment.current_user 는 이미 설정되어 있다.
+    1. 장비 상태 변경
+    2. 장비 이력 생성
+    3. applyform 상태 변경(승인)
     """
-    return update_equipment_status(request, Equipment.USED)
+    if request.method == "POST":
+        print(request.POST)
+        data_list = json.loads(request.body)
+
+        for data in data_list:
+            with transaction.atomic():
+                eq = Equipment.objects.select_for_update().get(pk=data.get('equipment_id'))
+                apply_form = EquipmentApply.objects.select_for_update().get(pk=data.get('apply_form_id'))
+
+                # 장비 정보 변경
+                eq.status = Equipment.USED
+                eq.current_user = apply_form.user
+                eq.purpose = apply_form.purpose
+                eq.check_in_duedate = apply_form.check_in_duedate
+
+                # 장비 이력 생성
+                eq_history = EquipmentHistory(user=apply_form.user
+                                            ,equipment=eq
+                                            ,purpose=apply_form.purpose
+                                            ,check_in_duedate=apply_form.check_in_duedate
+                                            ,note=apply_form.note
+                )
+
+                # applyform 상태 변경
+                apply_form.status = EquipmentApply.APPROVED
+                eq.save()
+                eq_history.save()
+                apply_form.save()
+
+        return JsonResponse({'message': '성공'})
+        
+    return JsonResponse({'error': '{} is unsupported method'.format(request.method)})
 
 
 def reject_use_eq(request):

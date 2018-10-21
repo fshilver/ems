@@ -113,9 +113,21 @@ class EquipmentRepairHistory(models.Model):
 
 
 class EquipmentApply(models.Model):
+
+    # STATUS 코드
+    APPLIED = 0
+    APPROVED = 10
+    DISAPPROVED = 20
+
+    STATUS = (
+        (APPLIED, '사용 신청 검토중'),
+        (APPROVED, '사용 승인'),
+        (DISAPPROVED, '사용 거절'),
+    )
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name="사용신청자")
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE, verbose_name="신청장비")
     purpose = models.TextField(verbose_name="사용 목적")
     check_in_duedate = models.DateField(verbose_name="반납 예정일")
     note = models.TextField(verbose_name="기타", blank=True, null=True)
     reject_reason = models.TextField(verbose_name="사용 신청 거절 이유", blank=True, null=True)
+    status = models.SmallIntegerField(choices=STATUS, default=APPLIED, verbose_name="상태")

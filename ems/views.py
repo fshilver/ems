@@ -275,8 +275,8 @@ class ApplyEquipmentListView(ListView):
 
     def get_queryset(self):
         if not self.request.user.is_superuser:
-            return EquipmentApply.objects.filter(user=self.request.user)
-        return super().get_queryset()
+            return EquipmentApply.objects.filter(user=self.request.user).filter(status=EquipmentApply.APPLIED)
+        return EquipmentApply.objects.filter(status=EquipmentApply.APPLIED)
 
 
     def get_template_names(self):

@@ -141,7 +141,7 @@ class EquipmentApplyForm(forms.ModelForm):
 
     class Meta:
         model = EquipmentApply
-        exclude = ('user', 'equipment', 'reject_reason')
+        exclude = ('user', 'equipment', 'reject_reason', 'status')
         widgets = {
             'purpose': forms.Textarea(attrs={'class': 'form-control'}),
             'check_in_duedate': forms.DateInput(

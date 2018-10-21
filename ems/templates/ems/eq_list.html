@@ -42,12 +42,14 @@
         <th class="column-title">현재 사용자</th>
         <th class="column-title">구입 날짜</th>
         <th class="column-title">가격</th>
+        <th class="column-title" style="width:5%;">사용이력</th>
         <th class="column-title" style="width:5%;">상세정보</th>
         <th class="column-title" style="width:5%;">수정</th>
     </tr>
     </thead>
     <tfoot>
         <tr>
+            <th></th>
             <th></th>
             <th></th>
             <th></th>
@@ -103,6 +105,11 @@ $(document).ready(function() {
                 {"data": "current_user"},
                 {"data": "purchase_date"},
                 {"data": "price"},
+                {
+                    data: null,
+                    orderable: false,
+                    defaultContent: '<button class="btn btn-success btn-sm btn-history">사용이력</button>'
+                },
                 {
                     data: null,
                     orderable: false,
@@ -274,6 +281,24 @@ $(document).ready(function() {
         .fail(function(xhr, textStatus, error) {
             alert(error);
         });
+    });
+
+    // 이력 modal
+    $('#table tbody').on('click', '.btn-history', function() {
+        var id = table.row($(this).parents('tr')).data().id;
+        var url = "{% url 'ems:eq_history_list' 9999 %}".replace(/9999/, id);
+        var management_number = table.row($(this).parents('tr')).data().management_number;
+
+        $.get(url)
+            .done(function(obj) {
+                var $modal = $('#modal-list')
+                $modal.find('#modal-title-id').html(management_number + ' 장비 이력');
+                $modal.find('.modal-body').html(obj);
+                $modal.modal();
+            })
+            .fail(function() {
+                alert('request failed');
+            });
     });
 
 
