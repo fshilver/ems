@@ -11,8 +11,7 @@
 
 {% block top_right_button %}
 <div class="form-group pull-right top_search">
-    <button id="table-btn-accept" class="btn btn-success" style="display: none;">승인</button>
-    <button id="table-btn-reject" class="btn btn-success" style="display: none;">반송</button>
+    <button id="table-btn-cancel" class="btn btn-success" style="display: none;">사용신청 취소</button>
 </div>
 {% endblock top_right_button %}
 
@@ -27,11 +26,9 @@
                 </div>
             </th>
             <th class="column-title">ID</th>
-            <th class="column-title">장비ID</th>
             <th class="column-title">관리번호</th>
-            <th class="column-title">S/N</th>
+            <th class="column-title">상태</th>
             <th class="column-title">모델</th>
-            <th class="column-title">신청한 사람</th>
             <th class="column-title">반납예정일</th>
             <th class="column-title">목적</th>
             <th class="column-title">상세Spec</th>
@@ -48,7 +45,7 @@ $(document).ready(function() {
 
     table = $('#eq-list').DataTable(
         {
-            ajax: "{% url 'ems:apply_eq_list' %}",
+            ajax: "{% url 'ems:apply_eq_history' %}",
             columns: [
                 {
                     data: function(row, type, set) { return '';},
@@ -57,11 +54,9 @@ $(document).ready(function() {
                     orderable: false
                 },
                 {"data": "id"},
-                {"data": "equipment_id"},
                 {"data": "management_number"},
-                {"data": "serial_number"},
+                {"data": "status"},
                 {"data": "model"},
-                {"data": "requester"},
                 {"data": "check_in_duedate"},
                 {"data": "purpose"},
                 {
@@ -72,7 +67,7 @@ $(document).ready(function() {
             ],
             columnDefs: [
                 {
-                    targets: [1,2],
+                    targets: [1],
                     visible: false
                 }
             ],
@@ -84,44 +79,8 @@ $(document).ready(function() {
         }
     );
 
-    // 장비 사용 승인
-    $('#table-btn-accept').on('click', function() {
-        var data_list = [];
-        $.each(table.rows('.selected').data(), function(index, element) {
-            var data = new Object();
-            data.equipment_id = element.equipment_id;
-            data.apply_form_id = element.id;
-            data_list.push(data);
-        });
-
-        $.ajax({
-            type: 'POST'
-            ,url: "{% url 'ems:apply_eq_accept_ajax' %}"
-            ,data: JSON.stringify(data_list)
-            ,dataType: 'json'
-            ,contentType: 'application/json; charset=utf-8'
-            ,success: function(data) {
-                new PNotify({
-                    title: 'Success',
-                    text: data['message'],
-                    type: 'success',
-                    styling: 'bootstrap3'
-                });
-                table.ajax.reload();
-            }
-            ,error: function(error) {
-                new PNotify({
-                    title: 'Error',
-                    text: error,
-                    type: 'error',
-                    styling: 'bootstrap3'
-                });
-            }
-        });
-    });
-
-    // 장비 사용 거부
-    $('#table-btn-reject').on('click', function() {
+    // 사용 신청 취소
+    $('#table-btn-cancel').on('click', function() {
         var eq_list = [];
         $.each(table.rows('.selected').data(), function(index, element) {
             eq_list.push(element.id);
@@ -168,11 +127,8 @@ $(document).ready(function() {
 
     // 1개 이상의 row 가 선택될 경우 btn show
     table.on('select', function(e, dt, type, indexes) {
-        if ($('#table-btn-accept').is(":hidden")) {
-            $('#table-btn-accept').show();
-        }
-        if ($('#table-btn-reject').is(":hidden")) {
-            $('#table-btn-reject').show();
+        if ($('#table-btn-cancel').is(":hidden")) {
+            $('#table-btn-cancel').show();
         }
     });
 
@@ -180,14 +136,13 @@ $(document).ready(function() {
     table.on('deselect', function(e, dt, type, indexes) {
         var rows = table.rows( { selected: true } ).count();
         if (rows < 1) {
-            $('#table-btn-accept').hide();
-            $('#table-btn-reject').hide();
+            $('#table-btn-cancel').hide();
         }
     });
 
     // 상세정보 Modal
     $('#eq-list tbody').on('click', 'button', function() {
-        var id = table.row($(this).parents('tr')).data().equipment_id;
+        var id = table.row($(this).parents('tr')).data().id;
         var url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
         var management_number = table.row($(this).parents('tr')).data().management_number;
 

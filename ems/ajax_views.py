@@ -65,7 +65,6 @@ def accept_use_eq(request):
     3. applyform 상태 변경(승인)
     """
     if request.method == "POST":
-        print(request.POST)
         data_list = json.loads(request.body)
 
         for data in data_list:

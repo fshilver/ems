@@ -14,6 +14,7 @@ from .views import (
     EquipmentDeleteView,
     EquipmentSpecUpdateView,
     EquipmentSpecDetailView,
+    EquipmentApplyFormListView,
     UsableEquipmentListView,
     UsedEquipmentListView,
     ApplyEquipmentListView,
@@ -59,6 +60,10 @@ urlpatterns = [
     # 사용 중인 장비 목록
     path('eq/used/', UsedEquipmentListView.as_view(), name='used_eq_list'),
 
+    # 사용 신청 이력
+    path('eq/apply/history/', EquipmentApplyFormListView.as_view(), name='apply_eq_history'),
+
+    # 사용 신청한 장비 목록
     path('eq/apply/', ApplyEquipmentListView.as_view(), name='apply_eq_list'),
 
     # 장비 사용 신청

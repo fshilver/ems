@@ -47,8 +47,11 @@
           <ul class="nav child_menu">
             <li><a href="{% url 'ems:usable_eq_list' %}">장비 사용 신청하기</a></li>
             <li><a href="{% url 'ems:used_eq_list' %}">사용 중인 장비 목록</a></li>
-            <li><a href="{% url 'ems:apply_eq_list' %}">사용 신청한 장비 목록</a></li>
-            <li><a href="{% url 'ems:return_eq_list' %}">반납 신청한 장비 목록</a></li>
+            <li><a href="{% url 'ems:apply_eq_history' %}">장비 사용 신청 이력</a></li>
+            <li><a href="{% url 'ems:return_eq_list' %}">장비 반납 신청 이력</a></li>
+            {% if user.is_superuser %}
+            <li><a href="{% url 'ems:apply_eq_list' %}">장비 사용 신청 목록</a></li>
+            {% endif %}
           </ul>
         </li>
 

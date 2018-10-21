@@ -267,23 +267,44 @@ class UsedEquipmentListView(ListView):
 
 
 class ApplyEquipmentListView(ListView):
+    model = EquipmentApply
+    template_name = 'ems/apply_eq_list.html'
+    queryset = EquipmentApply.objects.filter(status=EquipmentApply.APPLIED)
+
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            data = []
+            if self.object_list:
+                for obj in self.object_list:
+                    eq_data = {
+                        'id': obj.id,
+                        'equipment_id': obj.equipment.id,
+                        'management_number': obj.equipment.management_number,
+                        'status': obj.get_status_display(),
+                        'serial_number': obj.equipment.serial_number,
+                        'model': obj.equipment.model,
+                        'requester': obj.user.name,
+                        'check_in_duedate': obj.check_in_duedate,
+                        'purpose': obj.purpose,
+                    }
+                    data.append(eq_data)
+            return JsonResponse({'data': data})
+
+        return super().render_to_response(context)
+
+
+
+class EquipmentApplyFormListView(ListView):
     """
     사용 신청한 장비 목록
     """
     model = EquipmentApply
-    template_name = 'ems/apply_eq_list.html'
+    template_name = 'ems/eq_apply_form_list.html'
 
     def get_queryset(self):
         if not self.request.user.is_superuser:
-            return EquipmentApply.objects.filter(user=self.request.user).filter(status=EquipmentApply.APPLIED)
-        return EquipmentApply.objects.filter(status=EquipmentApply.APPLIED)
-
-
-    def get_template_names(self):
-        if self.request.user.is_superuser:
-            return ['ems/apply_eq_list_for_superadmin.html']
-        else:
-            return super().get_template_names()
+            return EquipmentApply.objects.filter(user=self.request.user)
+        return super().get_queryset()
 
 
     def render_to_response(self, context):
@@ -295,6 +316,7 @@ class ApplyEquipmentListView(ListView):
                         'id': obj.id,
                         'equipment_id': obj.equipment.id,
                         'management_number': obj.equipment.management_number,
+                        'status': obj.get_status_display(),
                         'serial_number': obj.equipment.serial_number,
                         'model': obj.equipment.model,
                         'requester': obj.user.name,
@@ -351,7 +373,7 @@ class ApplyEquipmentAcceptView(UpdateView):
     model = Equipment
     fields = ('status',)
     template_name = 'ems/apply_eq_accept_form.html'
-    success_url = reverse_lazy('ems:apply_eq_list')
+    success_url = reverse_lazy('ems:apply_eq_history')
 
     def form_valid(self, form):
         form.instance.status = Equipment.USED
@@ -365,7 +387,7 @@ class ApplyEquipmentRejectView(UpdateView):
     model = Equipment
     fields = ('status',)
     template_name = 'ems/apply_eq_reject_form.html'
-    success_url = reverse_lazy('ems:apply_eq_list')
+    success_url = reverse_lazy('ems:apply_eq_history')
 
     def form_valid(self, form):
         form.instance.status = Equipment.USABLE
@@ -435,7 +457,7 @@ class ReturnEquipmentAcceptView(UpdateView):
     model = Equipment
     fields = ('status',)
     template_name = 'ems/return_eq_accept_form.html'
-    success_url = reverse_lazy('ems:apply_eq_list')
+    success_url = reverse_lazy('ems:apply_eq_history')
 
     def form_valid(self, form):
         form.instance.status = Equipment.USABLE
@@ -450,7 +472,7 @@ class ReturnEquipmentRejectView(UpdateView):
     model = Equipment
     fields = ('status',)
     template_name = 'ems/return_eq_reject_form.html'
-    success_url = reverse_lazy('ems:apply_eq_list')
+    success_url = reverse_lazy('ems:apply_eq_history')
 
     def form_valid(self, form):
         form.instance.status = Equipment.USED
