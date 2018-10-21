@@ -370,35 +370,6 @@ def apply_eq_form_view(request):
 
 
 
-class ApplyEquipmentAcceptView(UpdateView):
-    """
-    장비 사용 승인
-    """
-    model = Equipment
-    fields = ('status',)
-    template_name = 'ems/apply_eq_accept_form.html'
-    success_url = reverse_lazy('ems:apply_eq_history')
-
-    def form_valid(self, form):
-        form.instance.status = Equipment.USED
-        return super().form_valid(form)
-
-
-class ApplyEquipmentRejectView(UpdateView):
-    """
-    장비 사용 신청 취소
-    """
-    model = Equipment
-    fields = ('status',)
-    template_name = 'ems/apply_eq_reject_form.html'
-    success_url = reverse_lazy('ems:apply_eq_history')
-
-    def form_valid(self, form):
-        form.instance.status = Equipment.USABLE
-        form.instance.current_user = None
-        return super().form_valid(form)
-
-
 class ReturnEquipmentListView(ListView):
     """
     반납 신청한 장비 목록
@@ -439,48 +410,6 @@ class ReturnEquipmentListView(ListView):
         print("template view")
         return super().render_to_response(context)
 
-
-class ReturnEquipmentView(UpdateView):
-    """
-    장비 반납 신청
-    """
-    model = Equipment
-    fields = ('status',)
-    template_name = 'ems/return_eq.html'
-    success_url = reverse_lazy('ems:used_eq_list')
-
-    def form_valid(self, form):
-        form.instance.status = Equipment.WAITING_FOR_ACCEPT_TO_RETURN
-        return super().form_valid(form)
-
-
-class ReturnEquipmentAcceptView(UpdateView):
-    """
-    장비 반납 신청 승인
-    """
-    model = Equipment
-    fields = ('status',)
-    template_name = 'ems/return_eq_accept_form.html'
-    success_url = reverse_lazy('ems:apply_eq_history')
-
-    def form_valid(self, form):
-        form.instance.status = Equipment.USABLE
-        form.instance.current_user = None
-        return super().form_valid(form)
-
-
-class ReturnEquipmentRejectView(UpdateView):
-    """
-    장비 반납 신청 취소
-    """
-    model = Equipment
-    fields = ('status',)
-    template_name = 'ems/return_eq_reject_form.html'
-    success_url = reverse_lazy('ems:apply_eq_history')
-
-    def form_valid(self, form):
-        form.instance.status = Equipment.USED
-        return super().form_valid(form)
 
 
 ####################################
