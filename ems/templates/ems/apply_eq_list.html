@@ -124,18 +124,20 @@ $(document).ready(function() {
 
     // 장비 사용 거부
     $('#table-btn-reject').on('click', function() {
-        var eq_list = [];
+        var data_list = [];
         $.each(table.rows('.selected').data(), function(index, element) {
-            eq_list.push(element.id);
+            var data = new Object();
+            data.equipment_id = element.equipment_id;
+            data.apply_form_id = element.id;
+            data_list.push(data);
         });
 
         $.ajax({
             type: 'POST'
             ,url: "{% url 'ems:apply_eq_reject_ajax' %}"
-            ,data: {
-                'ids' : eq_list
-            }
+            ,data: JSON.stringify(data_list)
             ,dataType: 'json'
+            ,contentType: 'application/json; charset=utf-8'
             ,success: function(data) {
                 new PNotify({
                     title: 'Success',

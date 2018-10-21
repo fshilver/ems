@@ -345,7 +345,6 @@ def apply_eq_form_view(request):
                 with transaction.atomic():
                     eq = Equipment.objects.select_for_update().get(pk=id, status=Equipment.USABLE) # TODO: ORM 개선, 404 처리
                     eq.status = Equipment.WAITING_FOR_ACCEPT_TO_USE
-                    eq.current_user = request.user
                     eq.save()
                     eq_apply_form = EquipmentApply(user=request.user
                                                 ,equipment=eq

@@ -100,9 +100,55 @@ def accept_use_eq(request):
 def reject_use_eq(request):
     """
     장비 사용 신청 반송
-    사용 신청 반송 시 Equipment.current_user 는 다시 None 이 되어야 한다.
+    1. 장비 상태 변경
+    2. applyform 상태 변경(승인)
     """
-    return update_equipment_status(request, Equipment.USABLE, 'null')
+    if request.method == "POST":
+        data_list = json.loads(request.body)
+
+        for data in data_list:
+            with transaction.atomic():
+                # 장비 상태 변경
+                eq = Equipment.objects.select_for_update().get(pk=data.get('equipment_id'), status=Equipment.WAITING_FOR_ACCEPT_TO_USE)
+                eq.status = Equipment.USABLE
+
+                # applyform 상태 변경
+                apply_form = EquipmentApply.objects.select_for_update().get(pk=data.get('apply_form_id'))
+                apply_form.status = EquipmentApply.DISAPPROVED
+
+                eq.save()
+                apply_form.save()
+
+        return JsonResponse({'message': '성공'})
+        
+    return JsonResponse({'error': '{} is unsupported method'.format(request.method)})
+
+
+def cancel_apply_eq(request):
+    """
+    장비 사용 신청 취소
+    1. 장비 상태 변경
+    2. applyform 상태 변경(승인)
+    """
+    if request.method == "POST":
+        data_list = json.loads(request.body)
+
+        for data in data_list:
+            with transaction.atomic():
+                # 장비 상태 변경
+                eq = Equipment.objects.select_for_update().get(pk=data.get('equipment_id'), status=Equipment.WAITING_FOR_ACCEPT_TO_USE)
+                eq.status = Equipment.USABLE
+
+                # applyform 상태 변경
+                apply_form = EquipmentApply.objects.select_for_update().get(pk=data.get('apply_form_id'))
+                apply_form.status = EquipmentApply.CANCELED
+
+                eq.save()
+                apply_form.save()
+
+        return JsonResponse({'message': '성공'})
+        
+    return JsonResponse({'error': '{} is unsupported method'.format(request.method)})
 
 
 def apply_return_eq(request):

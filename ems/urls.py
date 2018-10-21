@@ -38,6 +38,7 @@ from .ajax_views import (
     delete_repair_status,
     delete_equipment_type,
     change_status_eq,
+    cancel_apply_eq,
 )
 
 urlpatterns = [
@@ -76,6 +77,9 @@ urlpatterns = [
     # 장비 사용 거절
     path('eq/apply/reject/ajax/', reject_use_eq, name='apply_eq_reject_ajax'),
     path('eq/apply/<int:pk>/reject/', ApplyEquipmentRejectView.as_view(), name='apply_eq_reject'),
+
+    # 장비 사용 신청 취소
+    path('eq/apply/cancel/ajax/', cancel_apply_eq, name='cancel_apply_eq_ajax'),
 
     # 장비 반납 신청 목록
     path('eq/return/', ReturnEquipmentListView.as_view(), name='return_eq_list'),

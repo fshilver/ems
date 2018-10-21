@@ -17,7 +17,7 @@
 
 
 {% block table_content %}
-<table id="eq-list" class="table table-striped jambo_table">
+<table id="table" class="table table-striped jambo_table">
     <thead>
         <tr class="headings">
             <th>
@@ -26,6 +26,7 @@
                 </div>
             </th>
             <th class="column-title">ID</th>
+            <th class="column-title">장비ID</th>
             <th class="column-title">관리번호</th>
             <th class="column-title">상태</th>
             <th class="column-title">모델</th>
@@ -43,7 +44,7 @@
 var table;
 $(document).ready(function() {
 
-    table = $('#eq-list').DataTable(
+    table = $('#table').DataTable(
         {
             ajax: "{% url 'ems:apply_eq_history' %}",
             columns: [
@@ -54,6 +55,7 @@ $(document).ready(function() {
                     orderable: false
                 },
                 {"data": "id"},
+                {"data": "equipment_id"},
                 {"data": "management_number"},
                 {"data": "status"},
                 {"data": "model"},
@@ -67,7 +69,7 @@ $(document).ready(function() {
             ],
             columnDefs: [
                 {
-                    targets: [1],
+                    targets: [1,2],
                     visible: false
                 }
             ],
@@ -81,18 +83,36 @@ $(document).ready(function() {
 
     // 사용 신청 취소
     $('#table-btn-cancel').on('click', function() {
-        var eq_list = [];
-        $.each(table.rows('.selected').data(), function(index, element) {
-            eq_list.push(element.id);
+
+        var data_list = [];
+        var hasError = false;
+        $.each(table.rows({ selected: true}).data(), function(index, element) {
+            if (element.status != '사용 신청 검토중') { // EquipmentApply.APPLIED 문자열
+                hasError = true;
+                return;
+            }
+            var data = new Object();
+            data.equipment_id = element.equipment_id;
+            data.apply_form_id = element.id;
+            data_list.push(data);
         });
+
+        if (hasError) {
+            new PNotify({
+                title: 'Error',
+                text: '사용 신청 검토중인 항목에 대해서만 사용 신청 취소를 할 수 있습니다.',
+                type: 'error',
+                styling: 'bootstrap3'
+            });
+            return;
+        }
 
         $.ajax({
             type: 'POST'
-            ,url: "{% url 'ems:apply_eq_reject_ajax' %}"
-            ,data: {
-                'ids' : eq_list
-            }
+            ,url: "{% url 'ems:cancel_apply_eq_ajax' %}"
+            ,data: JSON.stringify(data_list)
             ,dataType: 'json'
+            ,contentType: 'application/json; charset=utf-8'
             ,success: function(data) {
                 new PNotify({
                     title: 'Success',
@@ -141,7 +161,7 @@ $(document).ready(function() {
     });
 
     // 상세정보 Modal
-    $('#eq-list tbody').on('click', 'button', function() {
+    $('#table tbody').on('click', 'button', function() {
         var id = table.row($(this).parents('tr')).data().id;
         var url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
         var management_number = table.row($(this).parents('tr')).data().management_number;

@@ -118,11 +118,13 @@ class EquipmentApply(models.Model):
     APPLIED = 0
     APPROVED = 10
     DISAPPROVED = 20
+    CANCELED = 30
 
     STATUS = (
-        (APPLIED, '사용 신청 검토중'),
+        (APPLIED, '사용 신청 검토중'), # FIXME: 문자열 변경 시 eq_apply_form_list.html 의 '사용신청' 부분도 같이 변경해줘야 함. 현재로선 더 나은 방법을 모르겠음
         (APPROVED, '사용 승인'),
         (DISAPPROVED, '사용 거절'),
+        (CANCELED, '사용 신청 취소'),
     )
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name="사용신청자")
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE, verbose_name="신청장비")
