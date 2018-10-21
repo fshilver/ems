@@ -267,6 +267,9 @@ class UsedEquipmentListView(ListView):
 
 
 class ApplyEquipmentListView(ListView):
+    """
+    사용 신청한 장비 목록
+    """
     model = EquipmentApply
     template_name = 'ems/apply_eq_list.html'
     queryset = EquipmentApply.objects.filter(status=EquipmentApply.APPLIED)
@@ -286,6 +289,7 @@ class ApplyEquipmentListView(ListView):
                         'requester': obj.user.name,
                         'check_in_duedate': obj.check_in_duedate,
                         'purpose': obj.purpose,
+                        'apply_date': obj.apply_date,
                     }
                     data.append(eq_data)
             return JsonResponse({'data': data})
@@ -296,7 +300,7 @@ class ApplyEquipmentListView(ListView):
 
 class EquipmentApplyFormListView(ListView):
     """
-    사용 신청한 장비 목록
+    장비 사용 신청 이력
     """
     model = EquipmentApply
     template_name = 'ems/eq_apply_form_list.html'
@@ -322,6 +326,7 @@ class EquipmentApplyFormListView(ListView):
                         'requester': obj.user.name,
                         'check_in_duedate': obj.check_in_duedate,
                         'purpose': obj.purpose,
+                        'apply_date': obj.apply_date,
                     }
                     data.append(eq_data)
             return JsonResponse({'data': data})

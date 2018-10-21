@@ -126,6 +126,7 @@ class EquipmentApply(models.Model):
         (DISAPPROVED, '사용 거절'),
         (CANCELED, '사용 신청 취소'),
     )
+    apply_date = models.DateField(auto_now_add=True, verbose_name="사용신청일")
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name="사용신청자")
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE, verbose_name="신청장비")
     purpose = models.TextField(verbose_name="사용 목적")
