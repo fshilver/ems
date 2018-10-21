@@ -1,19 +1,24 @@
+from django.db import transaction
 from django.forms.models import model_to_dict
 from django.http import JsonResponse, HttpResponse
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView, DetailView
 from django.urls import reverse_lazy
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import (
     RepairStatus,
     EquipmentType,
     Equipment,
     EquipmentSpec,
     EquipmentHistory,
+    EquipmentApply,
 )
 from .forms import (
     EquipmentSpecForm,
     EquipmentForm,
     EquipmentUpdateForm,
+    EquipmentApplyForm,
 )
+import re
 
 
 ####################################
@@ -265,15 +270,13 @@ class ApplyEquipmentListView(ListView):
     """
     사용 신청한 장비 목록
     """
-    model = Equipment
-    queryset = Equipment.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_USE)
+    model = EquipmentApply
     template_name = 'ems/apply_eq_list.html'
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return Equipment.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_USE)
-        else:
-            return Equipment.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_USE).filter(current_user=self.request.user)
+        if not self.request.user.is_superuser:
+            return EquipmentApply.objects.filter(user=self.request.user)
+        return super().get_queryset()
 
 
     def get_template_names(self):
@@ -286,34 +289,59 @@ class ApplyEquipmentListView(ListView):
     def render_to_response(self, context):
         if self.request.is_ajax():
             data = []
-            for obj in self.object_list:
-                eq_data = {
-                    'id': obj.id,
-                    'management_number': obj.management_number,
-                    'serial_number': obj.serial_number,
-                    'model': obj.model,
-                    'requester': obj.current_user.name,
-                    'purchase_date': obj.purchase_date
-                }
-                data.append(eq_data)
+            if self.object_list:
+                for obj in self.object_list:
+                    eq_data = {
+                        'id': obj.id,
+                        'equipment_id': obj.equipment.id,
+                        'management_number': obj.equipment.management_number,
+                        'serial_number': obj.equipment.serial_number,
+                        'model': obj.equipment.model,
+                        'requester': obj.user.name,
+                        'check_in_duedate': obj.check_in_duedate,
+                        'purpose': obj.purpose,
+                    }
+                    data.append(eq_data)
             return JsonResponse({'data': data})
 
         return super().render_to_response(context)
 
 
-class ApplyToUseEquipmentView(UpdateView):
-    """
-    장비 사용 신청
-    """
-    model = Equipment
-    fields = ('status',)
-    template_name = 'ems/apply_eq_form.html'
-    success_url = reverse_lazy('ems:usable_eq_list')
 
-    def form_valid(self, form):
-        form.instance.current_user = self.request.user
-        form.instance.status = Equipment.WAITING_FOR_ACCEPT_TO_USE
-        return super().form_valid(form)
+def apply_eq_form_view(request):
+    """
+    장비 사용 신청 modal form
+    """
+    if request.method == "POST":
+        form = EquipmentApplyForm(request.POST)
+
+        if form.is_valid():
+            raw_string = form.cleaned_data.get('equipment_list') # string : ['1549,1548,1547'] 
+            eq_id_list = re.sub("[\[\]']", '', raw_string).split(',') # -> list : ['1549', '1548', '1547']
+
+            for id in eq_id_list:
+                with transaction.atomic():
+                    eq = Equipment.objects.select_for_update().get(pk=id, status=Equipment.USABLE) # TODO: ORM 개선, 404 처리
+                    eq.status = Equipment.WAITING_FOR_ACCEPT_TO_USE
+                    eq.current_user = request.user
+                    eq.save()
+                    eq_apply_form = EquipmentApply(user=request.user
+                                                ,equipment=eq
+                                                ,purpose=form.cleaned_data['purpose']
+                                                ,check_in_duedate=form.cleaned_data['check_in_duedate']
+                                                ,note=form.cleaned_data['note']
+                    )
+                    eq_apply_form.save()
+            return redirect('ems:usable_eq_list')
+        else:
+            return render(request, "modal_form.html", context={"form": form})
+        
+    else:
+        # use initial value for hidden field(equipment_list) from get params : ?equipment_list=10,11
+        # in this case, get param name and hidden field name is same(equipment_list)
+        form = EquipmentApplyForm(initial=request.GET)
+    return render(request, "modal_form.html", context={"form": form})
+
 
 
 class ApplyEquipmentAcceptView(UpdateView):

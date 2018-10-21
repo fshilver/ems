@@ -27,10 +27,13 @@
                 </div>
             </th>
             <th class="column-title">ID</th>
+            <th class="column-title">장비ID</th>
             <th class="column-title">관리번호</th>
+            <th class="column-title">S/N</th>
             <th class="column-title">모델</th>
             <th class="column-title">신청한 사람</th>
-            <th class="column-title">구입 날짜</th>
+            <th class="column-title">반납예정일</th>
+            <th class="column-title">목적</th>
             <th class="column-title">상세Spec</th>
         </tr>
     </thead>
@@ -54,10 +57,13 @@ $(document).ready(function() {
                     orderable: false
                 },
                 {"data": "id"},
+                {"data": "equipment_id"},
                 {"data": "management_number"},
+                {"data": "serial_number"},
                 {"data": "model"},
                 {"data": "requester"},
-                {"data": "purchase_date"},
+                {"data": "check_in_duedate"},
+                {"data": "purpose"},
                 {
                     data: null,
                     orderable: false,
@@ -66,7 +72,7 @@ $(document).ready(function() {
             ],
             columnDefs: [
                 {
-                    targets: [1],
+                    targets: [1,2],
                     visible: false
                 }
             ],
@@ -179,7 +185,7 @@ $(document).ready(function() {
 
     // 상세정보 Modal
     $('#eq-list tbody').on('click', 'button', function() {
-        var id = table.row($(this).parents('tr')).data().id;
+        var id = table.row($(this).parents('tr')).data().equipment_id;
         var url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
         var management_number = table.row($(this).parents('tr')).data().management_number;
 

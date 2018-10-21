@@ -16,7 +16,6 @@ from .views import (
     EquipmentSpecDetailView,
     UsableEquipmentListView,
     UsedEquipmentListView,
-    ApplyToUseEquipmentView,
     ApplyEquipmentListView,
     ApplyEquipmentAcceptView,
     ApplyEquipmentRejectView,
@@ -25,6 +24,7 @@ from .views import (
     ReturnEquipmentAcceptView,
     ReturnEquipmentRejectView,
     EquipmentHistoryListView,
+    apply_eq_form_view,
 )
 
 from .ajax_views import (
@@ -62,8 +62,7 @@ urlpatterns = [
     path('eq/apply/', ApplyEquipmentListView.as_view(), name='apply_eq_list'),
 
     # 장비 사용 신청
-    path('eq/apply/ajax/', apply_use_eq, name='apply_eq_ajax'),
-    path('eq/apply/<int:pk>/', ApplyToUseEquipmentView.as_view(), name='apply_eq'),
+    path('eq/apply/ajax/', apply_eq_form_view, name='apply_eq_ajax'),
 
     # 장비 사용 승인
     path('eq/apply/accept/ajax/', accept_use_eq, name='apply_eq_accept_ajax'),

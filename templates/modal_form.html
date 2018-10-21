@@ -1,3 +1,4 @@
+<form class="form-horizontal form-label-left" action="" method="POST">
 {% csrf_token %}
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
@@ -8,7 +9,7 @@
 
 <div class="modal-body">
 
-    {% for field in form %}
+    {% for field in form.visible_fields %}
 
         {% if field.errors %}
 
@@ -38,6 +39,16 @@
         {% endif %}
 
     {% endfor %}
+
+    <!-- hidden fields -->
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    <!-- end hidden fields -->
+
+    {% block extra_fields %}
+    {% endblock extra_fields %}
+
 </div><!-- modal-body -->
 
 
@@ -46,3 +57,7 @@
     <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
     <button type="submit" class="btn btn-success">적용</button>
 </div><!-- modal-footer -->
+</form>
+<!-- 
+    {{ form.as_p }}
+ -->

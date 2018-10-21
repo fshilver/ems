@@ -12,7 +12,7 @@
 
 {% block top_right_button %}
 <div class="form-group pull-right top_search">
-    <button id="table-btn-1" class="btn btn-success" style="display: none;">사용신청</button>
+    <button id="table-btn-apply" class="btn btn-success" style="display: none;">사용신청</button>
 </div>
 {% endblock top_right_button %}
 
@@ -84,37 +84,26 @@ $(document).ready(function() {
         }
     );
 
-    $('#table-btn-1').on('click', function() {
+    // 사용 신청 form
+    $('#table-btn-apply').on('click', function() {
         var eq_list = [];
         $.each(table.rows('.selected').data(), function(index, element) {
             eq_list.push(element.id);
         });
+        var url = "{% url 'ems:apply_eq_ajax' %}?equipment_list=" + eq_list;
+        var modal_submit_url = "{% url 'ems:apply_eq_ajax' %}";
 
-        $.ajax({
-            type: 'POST'
-            ,url: "{% url 'ems:apply_eq_ajax' %}"
-            ,data: {
-                'ids' : eq_list
-            }
-            ,dataType: 'json'
-            ,success: function(data) {
-                new PNotify({
-                    title: 'Success',
-                    text: data['message'],
-                    type: 'success',
-                    styling: 'bootstrap3'
-                });
-                table.ajax.reload();
-            }
-            ,error: function(error) {
-                new PNotify({
-                    title: 'Error',
-                    text: error,
-                    type: 'error',
-                    styling: 'bootstrap3'
-                });
-            }
-        });
+        $.get(url)
+            .done(function(resp) {
+                var $modal = $('#form-modal');
+                $modal.find('#modal-title-id').html("사용 신청");
+                $modal.find('.modal-content').html(resp);
+                $modal.find('form').attr('action', modal_submit_url);
+                $modal.modal();
+            })
+            .fail(function() {
+                alert("request failed");
+            });
     });
 
     // table header 의 첫번째 checkbox 클릭 시 현재 페이지의 모든 row 선택
@@ -131,8 +120,8 @@ $(document).ready(function() {
 
     // 1개 이상의 row 가 선택될 경우 btn show
     table.on('select', function(e, dt, type, indexes) {
-        if ($('#table-btn-1').is(":hidden")) {
-            $('#table-btn-1').show();
+        if ($('#table-btn-apply').is(":hidden")) {
+            $('#table-btn-apply').show();
         }
     });
 
@@ -140,7 +129,7 @@ $(document).ready(function() {
     table.on('deselect', function(e, dt, type, indexes) {
         var rows = table.rows( { selected: true } ).count();
         if (rows < 1) {
-            $('#table-btn-1').hide();
+            $('#table-btn-apply').hide();
         }
     });
 
@@ -171,7 +160,7 @@ $(document).ready(function() {
 
         $.get(url)
             .done(function(obj) {
-                var $modal = $('#modal')
+                var $modal = $('#modal-list')
                 $modal.find('#modal-title-id').html(management_number + ' 장비 이력');
                 $modal.find('.modal-body').html(obj);
                 $modal.modal();

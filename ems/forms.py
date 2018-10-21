@@ -1,5 +1,5 @@
 from django import forms
-from .models import Equipment, EquipmentSpec
+from .models import Equipment, EquipmentSpec, EquipmentApply
 
 
 class EquipmentSpecForm(forms.ModelForm):
@@ -134,3 +134,22 @@ class EquipmentUpdateForm(forms.ModelForm):
             'document': forms.TextInput(attrs={'class': 'form-control'}),
         }
         
+
+class EquipmentApplyForm(forms.ModelForm):
+
+    equipment_list = forms.CharField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = EquipmentApply
+        exclude = ('user', 'equipment', 'reject_reason')
+        widgets = {
+            'purpose': forms.Textarea(attrs={'class': 'form-control'}),
+            'check_in_duedate': forms.DateInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': '입력 포맷 (2018-10-01)',
+                },
+                format='%Y-%m-%d',
+            ),
+            'note': forms.Textarea(attrs={'class': 'form-control'}),
+        }

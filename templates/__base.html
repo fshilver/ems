@@ -158,40 +158,16 @@
     </div>
 
 
-    {% block modal %}
     <!-- 단순한 modal -->
     <div id="modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
         <div class="modal-dialog modal-lg">
-
             <div class="modal-content">
-
-
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
-                    </button>
-                    <h4 class="modal-title" id="modal-title-id">Modal Title</h4>
-                </div><!-- modal-header -->
-
-
-                <div class="modal-body">
-                    {% block modal_body %}
-                    {% endblock modal_body %}
-                </div><!-- modal-body -->
-
-                <div class="modal-footer">
-                    {% block modal_footer %}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
-                    {% endblock modal_footer %}
-                </div><!-- modal-footer -->
-
             </div>
         </div>
     </div>
-    {% endblock modal %}
 
 
     <!-- form modal -->
-    {% block form_modal %}
     <div id="form-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
         <div class="modal-dialog modal-lg">
 
@@ -199,28 +175,19 @@
 
               <form action="" method="post" class="form-horizontal form-label-left">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
-                    </button>
-                    <h4 class="modal-title" id="form-modal-title-id">Modal Title</h4>
                 </div><!-- modal-header -->
 
 
                 <div class="modal-body">
-                    {% block form_modal_body %}
-                    {% endblock form_modal_body %}
                 </div><!-- modal-body -->
 
                 <div class="modal-footer">
-                    {% block form_modal_footer %}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
-                    {% endblock form_modal_footer %}
                 </div><!-- modal-footer -->
               </form>
 
             </div>
         </div>
     </div>
-    {% endblock form_modal %}
 
 
     {% block custom_js %}

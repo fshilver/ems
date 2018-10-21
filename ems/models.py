@@ -110,3 +110,12 @@ class EquipmentRepairHistory(models.Model):
     manager   = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, verbose_name='담당자')
     reference = models.CharField(max_length=50, blank=True, null=True, verbose_name='관련근거')
     count     = models.SmallIntegerField(verbose_name='Count')
+
+
+class EquipmentApply(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name="사용신청자")
+    equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE, verbose_name="신청장비")
+    purpose = models.TextField(verbose_name="사용 목적")
+    check_in_duedate = models.DateField(verbose_name="반납 예정일")
+    note = models.TextField(verbose_name="기타", blank=True, null=True)
+    reject_reason = models.TextField(verbose_name="사용 신청 거절 이유", blank=True, null=True)
