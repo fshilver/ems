@@ -11,6 +11,7 @@ from .models import (
     EquipmentSpec,
     EquipmentHistory,
     EquipmentApply,
+    EquipmentReturn,
 )
 from .forms import (
     EquipmentSpecForm,
@@ -18,6 +19,7 @@ from .forms import (
     EquipmentUpdateForm,
     EquipmentApplyForm,
     EquipmentRejectForm,
+    EquipmentReturnForm,
 )
 import re
 
@@ -405,6 +407,37 @@ def reject_eq_form_view(request):
 
 
 
+def return_eq_form_view(request):
+    """
+    장비 반납 신청 modal form
+    """
+    if request.method == "POST":
+        form = EquipmentReturnForm(request.POST)
+
+        if form.is_valid():
+            raw_string = form.cleaned_data.get('equipment_list') # string : ['1549,1548,1547'] 
+            eq_id_list = re.sub("[\[\]']", '', raw_string).split(',') # -> list : ['1549', '1548', '1547']
+
+            for id in eq_id_list:
+                with transaction.atomic():
+                    eq = Equipment.objects.select_for_update().get(pk=id, status=Equipment.USED) # TODO: ORM 개선, 404 처리
+                    eq.status = Equipment.WAITING_FOR_ACCEPT_TO_RETURN
+                    eq.save()
+                    eq_return = EquipmentReturn(user=request.user
+                                                ,equipment=eq
+                                                ,reason=form.cleaned_data['reason']
+                                                ,note=form.cleaned_data['note']
+                    )
+                    eq_return.save()
+            return redirect('ems:used_eq_list')
+        else:
+            return render(request, "modal_form.html", context={"form": form})
+        
+    else:
+        # use initial value for hidden field(equipment_list) from get params : ?equipment_list=10,11
+        # in this case, get param name and hidden field name is same(equipment_list)
+        form = EquipmentReturnForm(initial=request.GET)
+    return render(request, "modal_form.html", context={"form": form})
 
 
 
@@ -412,40 +445,38 @@ class ReturnEquipmentListView(ListView):
     """
     반납 신청한 장비 목록
     """
-    model = Equipment
+    model = EquipmentReturn
     template_name = 'ems/return_eq_list.html'
-
-    def get_template_names(self):
-        if self.request.user.is_superuser:
-            return ['ems/return_eq_list_for_superadmin.html']
-        return super().get_template_names()
 
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            return Equipment.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_RETURN)
+            #return EquipmentReturn.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_RETURN)
+            return self.model._default_manager.filter(status=EquipmentReturn.APPLIED)
         else:
-            return Equipment.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_RETURN).filter(current_user=self.request.user)
+            #return EquipmentReturn.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_RETURN).filter(current_user=self.request.user)
+            return self.model._default_manager.filter(status=EquipmentReturn.APPLIED).filter(current_user=self.request.user)
 
 
     def render_to_response(self, context):
         if self.request.is_ajax():
             data = []
-            for obj in self.object_list:
-                eq_data = {
-                    'id': obj.id,
-                    'management_number': obj.management_number,
-                    'kind': obj.kind.label,
-                    'model': obj.model,
-                    'requester': obj.current_user.name,
-                    'serial_number': obj.serial_number,
-                    'purchase_date': obj.purchase_date
+            if self.object_list:
+                for obj in self.object_list:
+                    eq_data = {
+                        'id': obj.id,
+                        'equipment_id': obj.equipment.id,
+                        'management_number': obj.equipment.management_number,
+                        'status': obj.get_status_display(),
+                        'serial_number': obj.equipment.serial_number,
+                        'model': obj.equipment.model,
+                        'requester': obj.user.name,
+                        'reason': obj.reason,
+                        'apply_date': obj.apply_date,
                     }
-                data.append(eq_data)
-            print("ajax view")
+                    data.append(eq_data)
             return  JsonResponse({'data': data})
 
-        print("template view")
         return super().render_to_response(context)
 
 

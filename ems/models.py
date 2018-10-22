@@ -134,3 +134,26 @@ class EquipmentApply(models.Model):
     note = models.TextField(verbose_name="기타", blank=True, null=True)
     reject_reason = models.TextField(verbose_name="사용 신청 거절 이유", blank=True, null=True)
     status = models.SmallIntegerField(choices=STATUS, default=APPLIED, verbose_name="상태")
+
+
+class EquipmentReturn(models.Model):
+
+    # STATUS 코드
+    APPLIED = 0
+    APPROVED = 10
+    DISAPPROVED = 20
+    CANCELED = 30
+
+    STATUS = (
+        (APPLIED, '반납 신청 검토중'), # FIXME: 문자열 변경 시 eq_apply_form_list.html 의 '사용신청' 부분도 같이 변경해줘야 함. 현재로선 더 나은 방법을 모르겠음
+        (APPROVED, '반납 승인'),
+        (DISAPPROVED, '반납 거절'),
+        (CANCELED, '반납 신청 취소'),
+    )
+    apply_date = models.DateField(auto_now_add=True, verbose_name="반납신청일")
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name="반납신청자")
+    equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE, verbose_name="신청장비")
+    reason = models.TextField(verbose_name="반납사유")
+    note = models.TextField(verbose_name="기타", blank=True, null=True)
+    reject_reason = models.TextField(verbose_name="반납신청 거절이유", blank=True, null=True)
+    status = models.SmallIntegerField(choices=STATUS, default=APPLIED, verbose_name="상태")

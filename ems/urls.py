@@ -22,6 +22,7 @@ from .views import (
     EquipmentHistoryListView,
     apply_eq_form_view,
     reject_eq_form_view,
+    return_eq_form_view,
 )
 
 from .ajax_views import (
@@ -63,7 +64,7 @@ urlpatterns = [
 
     path('eq/apply/cancel/ajax/', cancel_apply_eq, name='cancel_apply_eq_ajax'), # 장비 사용 신청 취소
     path('eq/return/', ReturnEquipmentListView.as_view(), name='return_eq_list'), # 장비 반납 신청 목록
-    path('eq/return/ajax/', apply_return_eq, name='apply_return_eq_ajax'), # 장비 반납 신청
+    path('eq/return/ajax/', return_eq_form_view, name='return_eq'), # 장비 반납 신청
     path('eq/return/accept/ajax/', accept_return_eq, name='accept_return_eq_ajax'), # 장비 반납 승인
     path('eq/return/reject/ajax/', reject_return_eq, name='reject_return_eq_ajax'), # 장비 반납 거절
 

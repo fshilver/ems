@@ -12,13 +12,13 @@
 
 {% block top_right_button %}
 <div class="form-group pull-right top_search">
-    <button id="table-btn-1" class="btn btn-success" style="display: none;">반납신청</button>
+    <button id="table-btn-return" class="btn btn-success" style="display: none;">반납신청</button>
 </div>
 {% endblock top_right_button %}
 
 
 {% block table_content %}
-<table id="eq-list" class="table table-striped jambo_table">
+<table id="table" class="table table-striped jambo_table">
     <thead>
         <tr class="headings">
             <th>
@@ -43,7 +43,7 @@
 var table;
 $(document).ready(function() {
 
-    table = $('#eq-list').DataTable(
+    table = $('#table').DataTable(
         {
             ajax: "{% url 'ems:used_eq_list' %}",
             columns: [
@@ -78,37 +78,26 @@ $(document).ready(function() {
         }
     );
 
-    $('#table-btn-1').on('click', function() {
+    // 반납 신청 modal form
+    $('#table-btn-return').on('click', function() {
         var eq_list = [];
         $.each(table.rows('.selected').data(), function(index, element) {
             eq_list.push(element.id);
         });
+        var url = "{% url 'ems:return_eq' %}?equipment_list=" + eq_list;
+        var modal_submit_url = "{% url 'ems:return_eq' %}";
 
-        $.ajax({
-            type: 'POST'
-            ,url: "{% url 'ems:apply_return_eq_ajax' %}"
-            ,data: {
-                'ids' : eq_list
-            }
-            ,dataType: 'json'
-            ,success: function(data) {
-                new PNotify({
-                    title: 'Success',
-                    text: data['message'],
-                    type: 'success',
-                    styling: 'bootstrap3'
-                });
-                table.ajax.reload();
-            }
-            ,error: function(error) {
-                new PNotify({
-                    title: 'Error',
-                    text: error,
-                    type: 'error',
-                    styling: 'bootstrap3'
-                });
-            }
-        });
+        $.get(url)
+            .done(function(resp) {
+                var $modal = $('#form-modal');
+                $modal.find('#modal-title-id').html("사용 신청");
+                $modal.find('.modal-content').html(resp);
+                $modal.find('form').attr('action', modal_submit_url);
+                $modal.modal();
+            })
+            .fail(function() {
+                alert("request failed");
+            });
     });
 
     // table header 의 첫번째 checkbox 클릭 시 현재 페이지의 모든 row 선택
@@ -125,8 +114,8 @@ $(document).ready(function() {
 
     // 1개 이상의 row 가 선택될 경우 btn show
     table.on('select', function(e, dt, type, indexes) {
-        if ($('#table-btn-1').is(":hidden")) {
-            $('#table-btn-1').show();
+        if ($('#table-btn-return').is(":hidden")) {
+            $('#table-btn-return').show();
         }
     });
 
@@ -134,12 +123,12 @@ $(document).ready(function() {
     table.on('deselect', function(e, dt, type, indexes) {
         var rows = table.rows( { selected: true } ).count();
         if (rows < 1) {
-            $('#table-btn-1').hide();
+            $('#table-btn-return').hide();
         }
     });
 
     // 상세정보 Modal
-    $('#eq-list tbody').on('click', 'button', function() {
+    $('#table tbody').on('click', 'button', function() {
         var id = table.row($(this).parents('tr')).data().id;
         var url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
         var management_number = table.row($(this).parents('tr')).data().management_number;

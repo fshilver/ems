@@ -1,5 +1,10 @@
 from django import forms
-from .models import Equipment, EquipmentSpec, EquipmentApply
+from .models import (
+    Equipment,
+    EquipmentSpec,
+    EquipmentApply,
+    EquipmentReturn,
+)
 
 
 class EquipmentSpecForm(forms.ModelForm):
@@ -168,4 +173,19 @@ class EquipmentRejectForm(forms.ModelForm):
         fields = ('reject_reason',)
         widgets = {
             'reject_reason': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
+
+class EquipmentReturnForm(forms.ModelForm):
+    """
+    장비 반납 신청 폼
+    """
+    equipment_list = forms.CharField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = EquipmentReturn
+        exclude = ('user', 'equipment', 'reject_reason', 'status')
+        widgets = {
+            'reason': forms.Textarea(attrs={'class': 'form-control'}),
+            'note': forms.Textarea(attrs={'class': 'form-control'}),
         }
