@@ -100,6 +100,9 @@ class EquipmentHistory(models.Model):
     note             = models.TextField(verbose_name='비고', null=True)
     count            = models.SmallIntegerField(verbose_name='Count', null=True)
 
+    class Meta:
+        ordering = ['check_out_date']
+
 
 class EquipmentRepairHistory(models.Model):
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)

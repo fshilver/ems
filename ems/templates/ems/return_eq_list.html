@@ -87,18 +87,20 @@ $(document).ready(function() {
 
     // 반납 신청 승인
     $('#table-btn-accept').on('click', function() {
-        var eq_list = [];
+        var data_list = [];
         $.each(table.rows('.selected').data(), function(index, element) {
-            eq_list.push(element.id);
+            var data = new Object();
+            data.equipment_id = element.equipment_id;
+            data.return_form_id = element.id;
+            data_list.push(data);
         });
 
         $.ajax({
             type: 'POST'
             ,url: "{% url 'ems:accept_return_eq_ajax' %}"
-            ,data: {
-                'ids' : eq_list
-            }
+            ,data: JSON.stringify(data_list)
             ,dataType: 'json'
+            ,contentType: 'application/json; charset=utf-8'
             ,success: function(data) {
                 new PNotify({
                     title: 'Success',

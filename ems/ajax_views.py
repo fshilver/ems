@@ -191,9 +191,36 @@ def apply_return_eq(request):
 def accept_return_eq(request):
     """
     장비 반납 신청 승인
-    반납 후 Equipment.current_user 는 None 이 되어야 한다.
+    1. 장비 상태 변경: USABLE
+    2. 장비 이력 수정: 반납일시, 반납확인
+    3. applyform 상태 변경
     """
-    return update_equipment_status(request, Equipment.USABLE, 'null')
+    if request.method == "POST":
+        data_list = json.loads(request.body)
+
+        for data in data_list:
+            with transaction.atomic():
+                eq = Equipment.objects.select_for_update().get(pk=data.get('equipment_id'))
+                return_form = EquipmentReturn.objects.select_for_update().get(pk=data.get('return_form_id'))
+
+                # 장비 정보 변경
+                eq.status = Equipment.USABLE
+                eq.current_user = None
+
+                # 장비 이력 수정
+                eq_history = EquipmentHistory.objects.select_for_update().filter(user=return_form.user).filter(equipment=eq).last()
+                eq_history.check_in_confirm = '반납확인' # TODO: 반납 확인자로 바꿔야 할 듯
+                print("eq_history id:{}".format(eq_history.pk))
+
+                # returnform 상태 변경
+                return_form.status = EquipmentReturn.APPROVED
+                eq.save()
+                eq_history.save()
+                return_form.save()
+
+        return JsonResponse({'message': '성공'})
+        
+    return JsonResponse({'error': '{} is unsupported method'.format(request.method)})
 
 
 def reject_return_eq(request):
