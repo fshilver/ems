@@ -26,6 +26,7 @@ def get_user_by_name(name):
     try:
         if user_name:
             u = User.objects.get(name=user_name)
+            return u
         else:
             return None
     except:

@@ -19,10 +19,14 @@ User = get_user_model()
 def get_user_by_name(name):
 
     user_name = clean_user_name(name)
+
+    if user_name == '미사용':
+        return None
     
     try:
         if user_name:
             u = User.objects.get(name=user_name)
+            return u
         else:
             return None
     except:
