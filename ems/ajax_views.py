@@ -14,6 +14,7 @@ from .models import (
     EquipmentReturn,
 )
 import json
+import datetime
 
 ####################################
 # Equipment
@@ -85,6 +86,7 @@ def accept_use_eq(request):
                                             ,purpose=apply_form.purpose
                                             ,check_in_duedate=apply_form.check_in_duedate
                                             ,note=apply_form.note
+                                            ,check_out_date=datetime.date.today()
                 )
 
                 # applyform 상태 변경
