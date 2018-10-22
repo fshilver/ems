@@ -451,11 +451,9 @@ class ReturnEquipmentListView(ListView):
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            #return EquipmentReturn.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_RETURN)
             return self.model._default_manager.filter(status=EquipmentReturn.APPLIED)
         else:
-            #return EquipmentReturn.objects.filter(status=Equipment.WAITING_FOR_ACCEPT_TO_RETURN).filter(current_user=self.request.user)
-            return self.model._default_manager.filter(status=EquipmentReturn.APPLIED).filter(current_user=self.request.user)
+            return self.model._default_manager.filter(status=EquipmentReturn.APPLIED).filter(user=self.request.user)
 
 
     def render_to_response(self, context):
@@ -476,6 +474,43 @@ class ReturnEquipmentListView(ListView):
                     }
                     data.append(eq_data)
             return  JsonResponse({'data': data})
+
+        return super().render_to_response(context)
+
+
+
+class EquipmentReturnFormListView(ListView):
+    """
+    장비 반납 신청 이력
+    """
+    model = EquipmentReturn
+    template_name = 'ems/eq_return_form_list.html'
+
+    def get_queryset(self):
+        if not self.request.user.is_superuser:
+            return self.model._default_manager.filter(user=self.request.user)
+        return super().get_queryset()
+
+
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            data = []
+            if self.object_list:
+                for obj in self.object_list:
+                    eq_data = {
+                        'id': obj.id,
+                        'equipment_id': obj.equipment.id,
+                        'management_number': obj.equipment.management_number,
+                        'status': obj.get_status_display(),
+                        'serial_number': obj.equipment.serial_number,
+                        'model': obj.equipment.model,
+                        'requester': obj.user.name,
+                        'reason': obj.reason,
+                        'apply_date': obj.apply_date,
+                        'reject_reason': obj.reject_reason,
+                    }
+                    data.append(eq_data)
+            return JsonResponse({'data': data})
 
         return super().render_to_response(context)
 

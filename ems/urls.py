@@ -15,6 +15,7 @@ from .views import (
     EquipmentSpecUpdateView,
     EquipmentSpecDetailView,
     EquipmentApplyFormListView,
+    EquipmentReturnFormListView,
     UsableEquipmentListView,
     UsedEquipmentListView,
     ApplyEquipmentListView,
@@ -36,6 +37,7 @@ from .ajax_views import (
     delete_equipment_type,
     change_status_eq,
     cancel_apply_eq,
+    cancel_return_eq,
 )
 
 urlpatterns = [
@@ -56,6 +58,7 @@ urlpatterns = [
     path('eq/usable/', UsableEquipmentListView.as_view(), name='usable_eq_list'), # 사용 신청 가능한 장비 목록
     path('eq/used/', UsedEquipmentListView.as_view(), name='used_eq_list'), # 사용 중인 장비 목록
     path('eq/apply/history/', EquipmentApplyFormListView.as_view(), name='apply_eq_history'), # 사용 신청 이력
+    path('eq/return/history/', EquipmentReturnFormListView.as_view(), name='return_eq_history'), # 반납 신청 이력
     path('eq/apply/', ApplyEquipmentListView.as_view(), name='apply_eq_list'), # 사용 신청한 장비 목록
     path('eq/apply/ajax/', apply_eq_form_view, name='apply_eq_ajax'), # 장비 사용 신청
     path('eq/apply/accept/ajax/', accept_use_eq, name='apply_eq_accept_ajax'), # 장비 사용 승인
@@ -63,6 +66,7 @@ urlpatterns = [
     path('eq/apply/reject/', reject_eq_form_view, name='reject_eq'), # 장비 사용 거절
 
     path('eq/apply/cancel/ajax/', cancel_apply_eq, name='cancel_apply_eq_ajax'), # 장비 사용 신청 취소
+    path('eq/return/cancel/ajax/', cancel_return_eq, name='cancel_return_eq_ajax'), # 장비 반납 신청 취소
     path('eq/return/', ReturnEquipmentListView.as_view(), name='return_eq_list'), # 장비 반납 신청 목록
     path('eq/return/ajax/', return_eq_form_view, name='return_eq'), # 장비 반납 신청
     path('eq/return/accept/ajax/', accept_return_eq, name='accept_return_eq_ajax'), # 장비 반납 승인

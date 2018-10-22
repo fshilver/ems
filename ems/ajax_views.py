@@ -11,6 +11,7 @@ from .models import (
     EquipmentType,
     EquipmentApply,
     EquipmentHistory,
+    EquipmentReturn,
 )
 import json
 
@@ -145,6 +146,33 @@ def cancel_apply_eq(request):
 
                 eq.save()
                 apply_form.save()
+
+        return JsonResponse({'message': '성공'})
+        
+    return JsonResponse({'error': '{} is unsupported method'.format(request.method)})
+
+
+def cancel_return_eq(request):
+    """
+    장비 반납 신청 취소
+    1. 장비 상태 변경
+    2. returnform 상태 변경
+    """
+    if request.method == "POST":
+        data_list = json.loads(request.body)
+
+        for data in data_list:
+            with transaction.atomic():
+                # 장비 상태 변경
+                eq = Equipment.objects.select_for_update().get(pk=data.get('equipment_id'), status=Equipment.WAITING_FOR_ACCEPT_TO_RETURN)
+                eq.status = Equipment.USED
+
+                # returnform 상태 변경
+                return_form = EquipmentReturn.objects.select_for_update().get(pk=data.get('return_form_id'))
+                return_form.status = EquipmentReturn.CANCELED
+
+                eq.save()
+                return_form.save()
 
         return JsonResponse({'message': '성공'})
         
