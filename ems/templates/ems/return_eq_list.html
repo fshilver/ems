@@ -121,38 +121,28 @@ $(document).ready(function() {
         });
     });
 
-    // 반납 신청 취소
+    // 반송
     $('#table-btn-reject').on('click', function() {
-        var eq_list = [];
+        var equipment_list = [];
+        var apply_form_list = [];
         $.each(table.rows('.selected').data(), function(index, element) {
-            eq_list.push(element.id);
+            equipment_list.push(element.equipment_id);
+            apply_form_list.push(element.id);
         });
+        var url = "{% url 'ems:reject_return_eq' %}?equipment_list=" + equipment_list + "&return_form_list=" + apply_form_list;
+        var modal_submit_url = "{% url 'ems:reject_return_eq' %}";
 
-        $.ajax({
-            type: 'POST'
-            ,url: "{% url 'ems:reject_return_eq_ajax' %}"
-            ,data: {
-                'ids' : eq_list
-            }
-            ,dataType: 'json'
-            ,success: function(data) {
-                new PNotify({
-                    title: 'Success',
-                    text: data['message'],
-                    type: 'success',
-                    styling: 'bootstrap3'
-                });
-                table.ajax.reload();
-            }
-            ,error: function(error) {
-                new PNotify({
-                    title: 'Error',
-                    text: error,
-                    type: 'error',
-                    styling: 'bootstrap3'
-                });
-            }
-        });
+        $.get(url)
+            .done(function(resp) {
+                var $modal = $('#form-modal');
+                $modal.find('#modal-title-id').html("반납 신청 반송");
+                $modal.find('.modal-content').html(resp);
+                $modal.find('form').attr('action', modal_submit_url);
+                $modal.modal();
+            })
+            .fail(function() {
+                alert("request failed");
+            });
     });
 
     // table header 의 첫번째 checkbox 클릭 시 현재 페이지의 모든 row 선택

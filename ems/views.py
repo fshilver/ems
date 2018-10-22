@@ -20,6 +20,7 @@ from .forms import (
     EquipmentApplyForm,
     EquipmentRejectForm,
     EquipmentReturnForm,
+    EquipmentRejectReturnForm,
 )
 import re
 
@@ -438,6 +439,39 @@ def return_eq_form_view(request):
         # in this case, get param name and hidden field name is same(equipment_list)
         form = EquipmentReturnForm(initial=request.GET)
     return render(request, "modal_form.html", context={"form": form})
+
+
+
+def reject_return_eq_form_view(request):
+    """
+    장비 반납 신청 거절 modal form
+    """
+    template_name = 'modal_form.html'
+
+    if request.method == "POST":
+        form = EquipmentRejectReturnForm(request.POST)
+
+        if form.is_valid():
+            raw_string = form.cleaned_data.get('return_form_list') # string : ['1549,1548,1547'] 
+            return_form_id_list = re.sub("[\[\]']", '', raw_string).split(',') # -> list : ['1549', '1548', '1547']
+
+            for id in return_form_id_list:
+                with transaction.atomic():
+                    return_form = EquipmentReturn.objects.select_for_update().get(pk=id) # TODO: ORM 개선, 404 처리
+                    return_form.reject_reason = form.cleaned_data.get('reject_reason')
+                    return_form.status = EquipmentReturn.DISAPPROVED
+
+                    eq = return_form.equipment
+                    eq.status = Equipment.USED
+
+                    return_form.save()
+                    eq.save()
+            return redirect('ems:return_eq_list')
+        else:
+            return render(request, template_name, context={"form": form})
+    else:
+        form = EquipmentRejectReturnForm(initial=request.GET)
+    return render(request, template_name, context={"form": form})
 
 
 

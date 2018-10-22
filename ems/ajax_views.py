@@ -225,14 +225,6 @@ def accept_return_eq(request):
     return JsonResponse({'error': '{} is unsupported method'.format(request.method)})
 
 
-def reject_return_eq(request):
-    """
-    장비 반납 신청 반송
-    반납 신청 반송 시 Equipment.current_user 는 이미 설정되어 있었으므로 변경할 필요 없다.
-    """
-    return update_equipment_status(request, Equipment.USED)
-
-
 def change_status_eq(request):
     if request.method == 'POST':
         status = request.POST.get('status_code', None)

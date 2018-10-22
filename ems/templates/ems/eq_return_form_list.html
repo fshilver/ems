@@ -197,7 +197,7 @@ $(document).ready(function() {
         var management_number = table.row($(this).parents('tr')).data().management_number;
 
         var $modal = $('#modal-detail');
-        $modal.find('#modal-title-id').html(management_number + ' 사용 신청 거절 사유');
+        $modal.find('#modal-title-id').html(management_number + ' 반송 사유');
         $modal.find('.modal-body').html(reject_reason.replace(/\r\n/g, '<br>'));
         $modal.modal();
     });

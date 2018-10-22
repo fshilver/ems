@@ -189,3 +189,17 @@ class EquipmentReturnForm(forms.ModelForm):
             'reason': forms.Textarea(attrs={'class': 'form-control'}),
             'note': forms.Textarea(attrs={'class': 'form-control'}),
         }
+
+
+class EquipmentRejectReturnForm(forms.ModelForm):
+    """
+    장비 반납 신청 거절 폼
+    """
+    return_form_list = forms.CharField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = EquipmentReturn
+        fields = ('reject_reason',)
+        widgets = {
+            'reject_reason': forms.Textarea(attrs={'class': 'form-control'}),
+        }
