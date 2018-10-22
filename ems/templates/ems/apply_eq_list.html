@@ -122,40 +122,28 @@ $(document).ready(function() {
         });
     });
 
-    // 장비 사용 거부
+    // 사용 신청 reject modal form
     $('#table-btn-reject').on('click', function() {
-        var data_list = [];
+        var equipment_list = [];
+        var apply_form_list = [];
         $.each(table.rows('.selected').data(), function(index, element) {
-            var data = new Object();
-            data.equipment_id = element.equipment_id;
-            data.apply_form_id = element.id;
-            data_list.push(data);
+            equipment_list.push(element.equipment_id);
+            apply_form_list.push(element.id);
         });
+        var url = "{% url 'ems:reject_eq' %}?equipment_list=" + equipment_list + "&apply_form_list=" + apply_form_list;
+        var modal_submit_url = "{% url 'ems:reject_eq' %}";
 
-        $.ajax({
-            type: 'POST'
-            ,url: "{% url 'ems:apply_eq_reject_ajax' %}"
-            ,data: JSON.stringify(data_list)
-            ,dataType: 'json'
-            ,contentType: 'application/json; charset=utf-8'
-            ,success: function(data) {
-                new PNotify({
-                    title: 'Success',
-                    text: data['message'],
-                    type: 'success',
-                    styling: 'bootstrap3'
-                });
-                table.ajax.reload();
-            }
-            ,error: function(error) {
-                new PNotify({
-                    title: 'Error',
-                    text: error,
-                    type: 'error',
-                    styling: 'bootstrap3'
-                });
-            }
-        });
+        $.get(url)
+            .done(function(resp) {
+                var $modal = $('#form-modal');
+                $modal.find('#modal-title-id').html("사용 신청");
+                $modal.find('.modal-content').html(resp);
+                $modal.find('form').attr('action', modal_submit_url);
+                $modal.modal();
+            })
+            .fail(function() {
+                alert("request failed");
+            });
     });
 
     // table header 의 첫번째 checkbox 클릭 시 현재 페이지의 모든 row 선택

@@ -17,6 +17,7 @@ from .forms import (
     EquipmentForm,
     EquipmentUpdateForm,
     EquipmentApplyForm,
+    EquipmentRejectForm,
 )
 import re
 
@@ -327,6 +328,7 @@ class EquipmentApplyFormListView(ListView):
                         'check_in_duedate': obj.check_in_duedate,
                         'purpose': obj.purpose,
                         'apply_date': obj.apply_date,
+                        'reject_reason': obj.reject_reason,
                     }
                     data.append(eq_data)
             return JsonResponse({'data': data})
@@ -367,6 +369,42 @@ def apply_eq_form_view(request):
         # in this case, get param name and hidden field name is same(equipment_list)
         form = EquipmentApplyForm(initial=request.GET)
     return render(request, "modal_form.html", context={"form": form})
+
+
+
+def reject_eq_form_view(request):
+    """
+    장비 사용 신청 거절 modal form
+    """
+    template_name = 'modal_form.html'
+
+    if request.method == "POST":
+        form = EquipmentRejectForm(request.POST)
+
+        if form.is_valid():
+            raw_string = form.cleaned_data.get('apply_form_list') # string : ['1549,1548,1547'] 
+            apply_form_id_list = re.sub("[\[\]']", '', raw_string).split(',') # -> list : ['1549', '1548', '1547']
+
+            for id in apply_form_id_list:
+                with transaction.atomic():
+                    apply_form = EquipmentApply.objects.select_for_update().get(pk=id) # TODO: ORM 개선, 404 처리
+                    apply_form.reject_reason = form.cleaned_data.get('reject_reason')
+                    apply_form.status = EquipmentApply.DISAPPROVED
+
+                    eq = apply_form.equipment
+                    eq.status = Equipment.USABLE
+
+                    apply_form.save()
+                    eq.save()
+            return redirect('ems:apply_eq_list')
+        else:
+            return render(request, template_name, context={"form": form})
+    else:
+        form = EquipmentRejectForm(initial=request.GET)
+    return render(request, template_name, context={"form": form})
+
+
+
 
 
 

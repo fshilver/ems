@@ -136,7 +136,9 @@ class EquipmentUpdateForm(forms.ModelForm):
         
 
 class EquipmentApplyForm(forms.ModelForm):
-
+    """
+    장비 사용 신청 폼
+    """
     equipment_list = forms.CharField(widget=forms.HiddenInput())
 
     class Meta:
@@ -152,4 +154,18 @@ class EquipmentApplyForm(forms.ModelForm):
                 format='%Y-%m-%d',
             ),
             'note': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
+
+class EquipmentRejectForm(forms.ModelForm):
+    """
+    장비 사용 신청 거절 폼
+    """
+    apply_form_list = forms.CharField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = EquipmentApply
+        fields = ('reject_reason',)
+        widgets = {
+            'reject_reason': forms.Textarea(attrs={'class': 'form-control'}),
         }

@@ -27,12 +27,13 @@
             </th>
             <th class="column-title">ID</th>
             <th class="column-title">장비ID</th>
+            <th class="column-title">거절사유</th>
             <th class="column-title">관리번호</th>
             <th class="column-title">상태</th>
             <th class="column-title">모델</th>
             <th class="column-title">사용신청일</th>
-            <th class="column-title">반납예정일</th>
             <th class="column-title">목적</th>
+            <th class="column-title">사유</th>
             <th class="column-title">상세Spec</th>
         </tr>
     </thead>
@@ -57,21 +58,30 @@ $(document).ready(function() {
                 },
                 {"data": "id"},
                 {"data": "equipment_id"},
+                {"data": "reject_reason"},
                 {"data": "management_number"},
                 {"data": "status"},
                 {"data": "model"},
                 {"data": "apply_date"},
-                {"data": "check_in_duedate"},
                 {"data": "purpose"},
+                {
+                    data: function(row, type, val, meta) {
+                        if (row.reject_reason == null) {
+                            return '<button class="btn btn-default btn-sm disabled">사유</button>'
+                        }
+                        return '<button class="btn btn-success btn-sm btn-reason">사유</button>'
+                    },
+                    orderable: false,
+                },
                 {
                     data: null,
                     orderable: false,
-                    defaultContent: '<button class="btn btn-success btn-sm">상세정보</button>'
+                    defaultContent: '<button class="btn btn-success btn-sm btn-detail">상세정보</button>'
                 }
             ],
             columnDefs: [
                 {
-                    targets: [1,2],
+                    targets: [1,2,3],
                     visible: false
                 }
             ],
@@ -163,8 +173,8 @@ $(document).ready(function() {
     });
 
     // 상세정보 Modal
-    $('#table tbody').on('click', 'button', function() {
-        var id = table.row($(this).parents('tr')).data().id;
+    $('#table tbody').on('click', '.btn-detail', function() {
+        var id = table.row($(this).parents('tr')).data().equipment_id;
         var url = "{% url 'ems:eq_spec_detail' 9999 %}".replace(/9999/, id);
         var management_number = table.row($(this).parents('tr')).data().management_number;
 
@@ -178,6 +188,18 @@ $(document).ready(function() {
             .fail(function(){
                 alert('request failed');
             });
+    });
+
+    // 사유 Modal
+    $('#table tbody').on('click', '.btn-reason', function() {
+        var id = table.row($(this).parents('tr')).data().id;
+        var reject_reason = table.row($(this).parents('tr')).data().reject_reason
+        var management_number = table.row($(this).parents('tr')).data().management_number;
+
+        var $modal = $('#modal-detail');
+        $modal.find('#modal-title-id').html(management_number + ' 사용 신청 거절 사유');
+        $modal.find('.modal-body').html(reject_reason.replace(/\r\n/g, '<br>'));
+        $modal.modal();
     });
 });
 </script>
