@@ -8,6 +8,7 @@ from .views import (
     UserUpdateView,
     UserDeleteView,
     CustomLoginView,
+    PasswordChangeView,
 )
 from .ajax_views import (
     activate_users,
@@ -20,6 +21,7 @@ from .views import GroupListView, GroupCreateView, GroupDeleteView, GroupUpdateV
 urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('password_change/', PasswordChangeView.as_view(), name='password_change'),
     path('users/', UserListView.as_view(), name='user_list'),
     path('users/activate/', activate_users, name='activate_users'),
     path('users/deactivate/', deactivate_users, name='deactivate_users'),

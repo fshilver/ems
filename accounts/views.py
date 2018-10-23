@@ -1,9 +1,11 @@
 from django.http import JsonResponse, HttpResponse
-from django.views.generic import ListView, CreateView, DeleteView, UpdateView
+from django.views.generic import ListView, CreateView, DeleteView, UpdateView, DetailView
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView
+from django.conf import settings
 from .forms import (
     SignUpForm,
     LoginForm,
@@ -194,3 +196,14 @@ class GroupUpdateView(UpdateView):
         if self.request.is_ajax():
             return HttpResponse("성공")
         return response
+
+
+class PasswordChangeView(auth_views.PasswordChangeView):
+    template_name = "accounts/password_change_form.html"
+    success_url = settings.LOGIN_REDIRECT_URL
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=None)
+        for field in form.fields:
+            form.fields[field].widget.attrs.update({'class': 'form-control'})
+        return form
