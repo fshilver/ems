@@ -31,9 +31,22 @@
             <th class="column-title">종류</th>
             <th class="column-title">모델</th>
             <th class="column-title">구입 날짜</th>
-            <th class="column-title">상세Spec</th>
+            <th class="column-title" style="width:5%;">사용이력</th>
+            <th class="column-title" style="width:5%;">상세Spec</th>
         </tr>
     </thead>
+    <tfoot>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </tfoot>
 </table>
 {% endblock table_content %}
 
@@ -45,6 +58,21 @@ $(document).ready(function() {
 
     table = $('#table').DataTable(
         {
+            initComplete: function() {
+                this.api().columns([3,4]).every(function() {
+                    var column = this;
+                    var select = $('<select><option value=""></option></select>')
+                        .appendTo( $(column.footer()).empty())
+                        .on('change', function() {
+                            var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                            column.search(val ? '^'+val+'$' : '', true, false).draw();
+                        });
+
+                    column.data().unique().sort().each(function(d, j) {
+                        select.append('<option value="'+d+'">'+d+'</option>');
+                    });
+                });
+            },
             ajax: "{% url 'ems:used_eq_list' %}",
             columns: [
                 {
@@ -58,6 +86,11 @@ $(document).ready(function() {
                 {"data": "kind"},
                 {"data": "model"},
                 {"data": "purchase_date"},
+                {
+                    data: null,
+                    orderable: false,
+                    defaultContent: '<button class="btn btn-success btn-sm btn-history">사용이력</button>'
+                },
                 {
                     data: null,
                     orderable: false,
@@ -141,6 +174,24 @@ $(document).ready(function() {
                 $modal.modal();
             })
             .fail(function(){
+                alert('request failed');
+            });
+    });
+
+    // 이력 modal
+    $('#table tbody').on('click', '.btn-history', function() {
+        var id = table.row($(this).parents('tr')).data().id;
+        var url = "{% url 'ems:eq_history_list' 9999 %}".replace(/9999/, id);
+        var management_number = table.row($(this).parents('tr')).data().management_number;
+
+        $.get(url)
+            .done(function(obj) {
+                var $modal = $('#modal-list')
+                $modal.find('#modal-title-id').html(management_number + ' 장비 이력');
+                $modal.find('.modal-body').html(obj);
+                $modal.modal();
+            })
+            .fail(function() {
                 alert('request failed');
             });
     });

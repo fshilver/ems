@@ -35,6 +35,18 @@
         <th class="column-title">상세Spec</th>
     </tr>
     </thead>
+    <tfoot>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </tfoot>
 </table>
 {% endblock table_content %}
 
@@ -46,6 +58,21 @@ $(document).ready(function() {
 
     table = $('#eq-list').DataTable(
         {
+            initComplete: function() {
+                this.api().columns([3,4]).every(function() {
+                    var column = this;
+                    var select = $('<select><option value=""></option></select>')
+                        .appendTo( $(column.footer()).empty())
+                        .on('change', function() {
+                            var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                            column.search(val ? '^'+val+'$' : '', true, false).draw();
+                        });
+
+                    column.data().unique().sort().each(function(d, j) {
+                        select.append('<option value="'+d+'">'+d+'</option>');
+                    });
+                });
+            },
             ajax: "{% url 'ems:usable_eq_list' %}",
             columns: [
                 {
