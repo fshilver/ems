@@ -13,31 +13,11 @@ from .forms import (
     UserUpdateForm,
 )
 
+
 class CustomLoginView(LoginView):
     authentication_form = LoginForm
     template_name = 'accounts/login.html'
 
-
-class UserListByGroupView(ListView):
-
-    template_name = "accounts/user_by_group_list.html"
-    context_object_name = 'allUsers'
-
-    def get_queryset(self):
-        pass
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        User = get_user_model()
-        groups = []
-        for group in Group.objects.filter(user=self.request.user):
-            group_dict = {}
-            group_dict['name'] = group.name
-            group_dict['users'] = User.objects.filter(groups__name__exact=group.name).exclude(id=self.request.user.id)
-            groups.append(group_dict)
-
-        context['groups'] = groups
-        return context
 
 
 class UserListView(ListView):
@@ -61,20 +41,6 @@ class UserListView(ListView):
         return super().render_to_response(context)
 
 
-class UserSignUpView(CreateView):
-    '''
-    팀 관리자(is_staff=True) 가 사용하는 user create view
-    '''
-    model = get_user_model()
-    form_class = SignUpForm
-    template_name = "accounts/user_form.html"
-    success_url = reverse_lazy('accounts:users_by_group')
-
-    def get_form_kwargs(self, *args, **kwargs):
-        form_kwargs = super().get_form_kwargs(*args, **kwargs)
-        form_kwargs['user'] = self.request.user
-        return form_kwargs
-
 
 class UserCreateView(CreateView):
     '''
@@ -95,6 +61,7 @@ class UserCreateView(CreateView):
         if self.request.is_ajax():
             return HttpResponse("성공")
         return response
+
 
 
 class UserUpdateView(UpdateView):
@@ -118,87 +85,21 @@ class UserUpdateView(UpdateView):
         return response
 
 
+
 class UserDeleteView(DeleteView):
-    '''
+    """
     superuser 가 사용하는 user delete view
-    '''
+    """
     model = get_user_model()
     template_name = "accounts/user_delete.html"
     success_url = reverse_lazy('accounts:user_list')
 
 
-class GroupListView(ListView):
-    model = Group
-    template_name = "accounts/group_list.html"
-
-    def render_to_response(self, context):
-        if self.request.is_ajax():
-            data = []
-            for obj in self.object_list:
-                group = {
-                    'id': obj.id,
-                    'name': obj.name,
-                }
-                data.append(group)
-            return JsonResponse({'data': data})
-        return super().render_to_response(context)
-
-
-class GroupCreateView(CreateView):
-    model = Group
-    template_name = "accounts/group_form.html"
-    success_url = reverse_lazy('accounts:group_list')
-    fields = ('name',)
-
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class=None)
-        for field in form.fields:
-            form.fields[field].widget.attrs.update({'class': 'form-control'})
-        return form
-
-    def get_template_names(self):
-        if self.request.is_ajax():
-            return ['modal_form.html']
-        return super().get_template_names()
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.request.is_ajax():
-            return HttpResponse("성공")
-        return response
-
-
-class GroupDeleteView(DeleteView):
-    model = Group
-    template_name = "accounts/group_delete.html"
-    success_url = reverse_lazy('accounts:group_list')
-
-
-class GroupUpdateView(UpdateView):
-    model = Group
-    fields = ('name',)
-    template_name = "accounts/group_form.html"
-    success_url = reverse_lazy('accounts:group_list')
-
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class=None)
-        for field in form.fields:
-            form.fields[field].widget.attrs.update({'class': 'form-control'})
-        return form
-
-    def get_template_names(self):
-        if self.request.is_ajax():
-            return ['modal_form.html']
-        return super().get_template_names()
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.request.is_ajax():
-            return HttpResponse("성공")
-        return response
-
 
 class PasswordChangeView(auth_views.PasswordChangeView):
+    """
+    사용자가 자신의 패스워드를 변경하는 modal view
+    """
     template_name = "accounts/password_change_form.html"
     success_url = settings.LOGIN_REDIRECT_URL
 

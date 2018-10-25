@@ -23,21 +23,9 @@
         <li><a><i class="fa fa-cogs"></i> 관리자 설정 <span class="fa fa-chevron-down"></span></a>
           <ul class="nav child_menu">
             <li><a href="{% url 'accounts:user_list' %}">사용자</a></li>
-            <li><a href="{% url 'accounts:group_list' %}">그룹</a></li>
             <li><a href="{% url 'ems:eq_list' %}">장비</a></li>
             <li><a href="{% url 'ems:repair_status_list' %}">수리 상태 라벨</a></li>
             <li><a href="{% url 'ems:eq_type_list' %}">장비 타입 라벨</a></li>
-          </ul>
-        </li>
-
-        {% endif %}
-
-        {% if user.is_staff %}
-
-        <li><a><i class="fa fa-cogs"></i> 팀 구성원 관리 <span class="fa fa-chevron-down"></span></a>
-          <ul class="nav child_menu">
-            <li><a href="{% url 'accounts:signup' %}">구성원 추가 </a></li>
-            <li><a href="{% url 'accounts:users_by_group' %}">구성원 정보 </a></li>
           </ul>
         </li>
 

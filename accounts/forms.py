@@ -45,91 +45,48 @@ class CustomUserChangeForm(UserChangeForm):
 
 class UserUpdateForm(forms.ModelForm):
 
-    groups = forms.ModelMultipleChoiceField(
-        label='소속 사업부',
-        queryset=Group.objects.all(),
-        required=True,
-        widget=forms.SelectMultiple(attrs={'class': 'select2_multiple form-control'}),
-    )
-
     class Meta:
         model = get_user_model()
-        fields = ('name', 'is_active', 'is_staff')
+        fields = ('name', 'is_active')
         labels = {
             'name': '이름',
             'is_active': '활성화',
-            'is_staff': '팀 관리자',
         }
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'flat'}),
-            'is_staff': forms.CheckboxInput(attrs={'class': 'flat'}),
         }
-
-    def __init__(self, *args, **kwargs):
-        instance = kwargs.get('instance', None)
-        if instance is not None:
-            initial = kwargs.get('initial', {})
-            initial['groups'] = instance.groups.all()
-            kwargs['initial'] = initial
-        return super().__init__(*args, **kwargs)
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        if commit:
-            user.save()
-            user.groups.set(self.cleaned_data['groups'])
-        return user
 
 
 
 class SignUpForm(forms.ModelForm):
 
-    field_order = ('email', 'name', 'password1', 'password2', 'is_active', 'is_staff', 'groups')
+    field_order = ('email', 'name', 'password1', 'password2', 'is_active')
 
-    groups = forms.ModelMultipleChoiceField(
-        label='소속 사업부',
-        queryset=None,
-        required=True,
-        widget=forms.SelectMultiple(attrs={'class': 'select2_multiple form-control'}),
-    )
     password1 = forms.CharField(
         label='Password',
-        widget=forms.PasswordInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         strip=False,
     )
     password2 = forms.CharField(
         label='Password Confirmation',
-        widget=forms.PasswordInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         strip=False,
     )
 
     class Meta:
         model = get_user_model()
-        fields = ('email', 'name', 'is_active', 'is_staff', 'groups')
+        fields = ('email', 'name', 'is_active')
         labels = {
             'email': 'Email',
-            'name': 'Name',
+            'name': '이름',
             'is_active': '활성화 여부',
-            'is_staff': '팀 관리자 여부',
         }
         widgets = {
-            'email': forms.EmailInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
-            'name': forms.TextInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'flat'}),
-            'is_staff': forms.CheckboxInput(attrs={'class': 'flat'}),
         }
-
-    def __init__(self, user=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if user:
-            if user.is_superuser:
-                self.fields['groups'].queryset = Group.objects.all()
-            else:
-                self.fields['groups'].queryset = Group.objects.filter(user=user)
-        else:
-            self.fields['groups'].queryset = Group.objects.all()
-
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -138,17 +95,11 @@ class SignUpForm(forms.ModelForm):
             raise forms.ValidationError("Passwords don't match")
         return password2
 
-    def form_valid(self, form):
-        self.object.groups.clear()
-        self.object.groups.add(form.cleaned_data['groups'])
-
     def save(self, commit=True):
         user = super(SignUpForm, self).save(commit=False)
-
         user.set_password(self.cleaned_data["password1"])
         if commit:
             user.save()
-            user.groups.add(*self.cleaned_data['groups']) # groups 는 list 이기 때문에 *self 로 사용
         return user
 
 
