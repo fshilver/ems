@@ -306,13 +306,11 @@ def get_date(text):
         dd = int(dd) if dd != '' else 1
 
     except ValueError:
-        print("date ValueError1: '{}' set to 9999-12-31".format(text))
         return datetime.date(9999,12,31)
 
     try:
         date = datetime.date(yyyy, mm, dd)
     except ValueError:
-        print("date ValueError2: '{}' set to 9999-12-31".format(text))
         date = datetime.date(9999,12,31)
 
     return date
@@ -331,5 +329,4 @@ def get_price(text):
     try:
         return int(text.replace(',',''))
     except ValueError:
-        print("cost ValueError: {}, set to 0".format(text))
         return 0

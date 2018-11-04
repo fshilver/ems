@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from .views import HomeView
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,3 +25,9 @@ urlpatterns = [
     path('ems/', include(('ems.urls', 'ems'), namespace='ems')),
     path('', HomeView.as_view(), name='home'),
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+            path('__debug/', include(debug_toolbar.urls)),
+    ]

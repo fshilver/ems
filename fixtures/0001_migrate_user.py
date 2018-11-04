@@ -1,12 +1,15 @@
 import sys
-sys.path.append('..')
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'castis_erp.settings')
 import django
-django.setup()
-
 import csv
-#from castis_erp.fixtures.utils import clean_user_name, active_email_address
+import datetime
+from django.contrib.auth import get_user_model
+
+sys.path.append('..')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'castis_erp.settings.development')
+django.setup()
+User = get_user_model()
+
 from utils import clean_user_name, active_email_address
 
 user_name_set = set()
@@ -44,13 +47,9 @@ for user_name in user_name_set:
         continue
 
     if user_name not in active_email_address:
-        print("add to deactive user:{},retiree{}@castis.com".format(user_name, n))
         deactive_email_address[user_name] = 'retiree{}@castis.com'.format(n)
         n += 1
 
-
-from django.contrib.auth import get_user_model
-User = get_user_model()
 
 for user_name in active_email_address:
     u = User.objects.create_user(active_email_address[user_name], user_name, password='castis')

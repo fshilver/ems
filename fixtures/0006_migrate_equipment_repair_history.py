@@ -1,20 +1,18 @@
 import sys
-sys.path.append('..')
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'castis_erp.settings')
 import django
-django.setup()
-
 import csv
-
-from ems.models import Equipment, EquipmentRepairHistory
 import datetime
-
-from utils import clean_user_name, name_change_map, get_date, get_price
-
 from django.contrib.auth import get_user_model
 
+sys.path.append('..')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'castis_erp.settings.development')
+django.setup()
 User = get_user_model()
+
+from utils import clean_user_name, name_change_map, get_date, get_price
+from ems.models import Equipment, EquipmentRepairHistory
+
 
 def get_user_by_name(name):
 

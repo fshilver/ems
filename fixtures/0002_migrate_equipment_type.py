@@ -1,14 +1,16 @@
 import sys
-sys.path.append('..')
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'castis_erp.settings')
 import django
-django.setup()
-
 import csv
-
+import datetime
 from django.contrib.auth import get_user_model
-from ems.models import Equipment
+
+sys.path.append('..')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'castis_erp.settings.development')
+django.setup()
+User = get_user_model()
+
+from ems.models import Equipment, EquipmentType
 
 kind_set = set()
 with open('장비목록.csv', encoding='euc-kr') as f:
@@ -18,8 +20,6 @@ with open('장비목록.csv', encoding='euc-kr') as f:
     for line in lines:
         if line[3]:
             kind_set.add(line[3])
-
-from ems.models import EquipmentType
 
 for kind in kind_set:
     e_type = EquipmentType(label=kind)
