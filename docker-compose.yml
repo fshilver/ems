@@ -1,0 +1,53 @@
+
+version: '3.5'
+
+services:
+  ems-db:
+    image: mariadb:10.3.9
+    container_name: ems-db
+    hostname : ems-db
+    volumes:
+      - ems-db-data:/var/lib/mysql
+    restart: unless-stopped
+    env_file:
+      - ./config.env
+    command: [
+      '--character-set-client-handshake=FALSE',
+      '--character-set-server=utf8mb4',
+      '--collation-server=utf8mb4_unicode_ci',
+      '--lower-case-table-names=1'
+    ]
+    ports:
+      - 3306:3306
+    networks:
+      - ems
+
+  ems-app:
+    depends_on:
+      - ems-db
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: fshilver/ems-app:1.2
+    container_name: ems-app
+    hostname: ems-app
+    restart: unless-stopped
+    environment:
+      MYSQL_HOST: ems-db
+      MYSQL_PORT: 3306
+    env_file:
+      - ./config.env
+    networks:
+      - ems
+    ports:
+      - 80:80
+    links:
+      - ems-db
+
+volumes:
+  ems-db-data:
+
+networks:
+  ems:
+     name: ems
+     driver: bridge

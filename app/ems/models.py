@@ -11,7 +11,7 @@ class RepairStatus(models.Model):
 
 
 class EquipmentType(models.Model):
-    label = models.CharField(max_length=10)
+    label = models.CharField(max_length=50)
 
     class Meta:
         unique_together = ('id', 'label')

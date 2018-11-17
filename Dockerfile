@@ -1,8 +1,9 @@
 FROM ubuntu:16.04
 MAINTAINER fshilver@gmail.com
 
+RUN sed -i 's/archive\.ubuntu/kr\.archive\.ubuntu/' /etc/apt/sources.list
+
 RUN apt-get update && \
-    apt-get upgrade -y && \
     apt-get install -y \
     git \
     python3 \
@@ -12,6 +13,7 @@ RUN apt-get update && \
     nginx \
     supervisor \
     language-pack-ko \
+    libmysqlclient-dev \
     sqlite3 && \
     pip3 install -U pip setuptools && \
     rm -rf /var/lib/apt/lists/*
@@ -35,7 +37,6 @@ ENV DJANGO_SETTINGS_MODULE castis_erp.settings.production
 
 COPY . /home/docker/code/
 WORKDIR /home/docker/code/app/
-RUN python3 manage.py collectstatic
 
 
 CMD ["supervisord", "-n"]
