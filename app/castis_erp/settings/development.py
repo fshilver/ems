@@ -2,6 +2,8 @@ from .base import *
 
 DEBUG = True
 
+DEV = True
+
 INSTALLED_APPS += [
     'django_extensions',
     'debug_toolbar',

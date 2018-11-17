@@ -136,3 +136,5 @@ LOGIN_REDIRECT_URL = reverse_lazy('ems:used_eq_list') # 반드시 정의할 것!
 LOGOUT_REDIRECT_URL = '/'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+DEV = False

@@ -26,7 +26,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
 ]
 
-if settings.DEBUG:
+if settings.DEV:
     import debug_toolbar
     urlpatterns += [
             path('__debug/', include(debug_toolbar.urls)),
