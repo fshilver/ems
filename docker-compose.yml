@@ -28,7 +28,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    image: fshilver/ems-app:1.2
+    image: fshilver/ems-app:0.1
     container_name: ems-app
     hostname: ems-app
     restart: unless-stopped
