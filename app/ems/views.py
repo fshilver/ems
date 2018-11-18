@@ -21,8 +21,10 @@ from .forms import (
     EquipmentRejectForm,
     EquipmentReturnForm,
     EquipmentRejectReturnForm,
+    EquipmentCheckOutForm,
 )
 import re
+import datetime
 
 
 ####################################
@@ -407,6 +409,49 @@ def reject_eq_form_view(request):
     return render(request, template_name, context={"form": form})
 
 
+def checkout_eq_form_view(request):
+    """
+    장비 사용 승인 modal form (관리자용 : 승인 절차 없이 바로 처리)
+    """
+    if request.method == "POST":
+        form = EquipmentCheckOutForm(request.POST)
+
+        if form.is_valid():
+            raw_string = form.cleaned_data.get('equipment_list') # string : ['1549,1548,1547'] 
+            eq_id_list = re.sub("[\[\]']", '', raw_string).split(',') # -> list : ['1549', '1548', '1547']
+
+            for id in eq_id_list:
+                with transaction.atomic():
+
+                    eq = Equipment.objects.select_for_update().get(pk=id, status=Equipment.USABLE) # TODO: ORM 개선, 404 처리
+
+                    # 장비 정보 변경
+                    eq.status = Equipment.USED
+                    eq.current_user = form.cleaned_data.get('user')
+                    eq.purpose = form.cleaned_data.get('purpose')
+                    eq.check_in_duedate = form.cleaned_data.get('check_in_duedate')
+
+                    # 장비 이력 생성
+                    eq_history = EquipmentHistory(user=eq.current_user
+                                                ,equipment=eq
+                                                ,purpose=eq.purpose
+                                                ,check_in_duedate=eq.check_in_duedate
+                                                ,note=form.cleaned_data.get('note')
+                                                ,check_out_date=datetime.date.today()
+                    )
+                    eq.save()
+                    eq_history.save()
+            return redirect('ems:eq_list')
+        else:
+            return render(request, "modal_form.html", context={"form": form})
+        
+    else:
+        # use initial value for hidden field(equipment_list) from get params : ?equipment_list=10,11
+        # in this case, get param name and hidden field name is same(equipment_list)
+        form = EquipmentCheckOutForm(initial=request.GET)
+    return render(request, "modal_form.html", context={"form": form})
+
+
 
 def return_eq_form_view(request):
     """
@@ -472,6 +517,45 @@ def reject_return_eq_form_view(request):
     else:
         form = EquipmentRejectReturnForm(initial=request.GET)
     return render(request, template_name, context={"form": form})
+
+
+
+def checkin_eq_form_view(request):
+    """
+    장비 반납 신청 modal form (관리자용 : 승인 절차 없이 바로 반납 처리)
+    """
+    if request.method == "POST":
+        form = EquipmentReturnForm(request.POST)
+
+        if form.is_valid():
+            raw_string = form.cleaned_data.get('equipment_list') # string : ['1549,1548,1547'] 
+            eq_id_list = re.sub("[\[\]']", '', raw_string).split(',') # -> list : ['1549', '1548', '1547']
+
+            for id in eq_id_list:
+                with transaction.atomic():
+                    eq_queryset = Equipment.objects.select_for_update().filter(pk=id, status=Equipment.USED) | Equipment.objects.select_for_update().filter(pk=id, status=Equipment.WAITING_FOR_ACCEPT_TO_RETURN) # TODO: ORM 개선, 404 처리
+                    eq = eq_queryset.first()
+
+                    # 장비 이력 수정
+                    eq_history = EquipmentHistory.objects.select_for_update().filter(user=eq.current_user).filter(equipment=eq).last()
+                    eq_history.check_in_confirm = '반납완료' # TODO: 반납 확인자로 바꿔야 할 듯
+
+                    # 장비 정보 변경
+                    eq.status = Equipment.USABLE
+                    eq.current_user = None
+
+                    eq.save()
+                    eq_history.save()
+
+            return redirect('ems:eq_list')
+        else:
+            return render(request, "modal_form.html", context={"form": form})
+        
+    else:
+        # use initial value for hidden field(equipment_list) from get params : ?equipment_list=10,11
+        # in this case, get param name and hidden field name is same(equipment_list)
+        form = EquipmentReturnForm(initial=request.GET)
+    return render(request, "modal_form.html", context={"form": form})
 
 
 

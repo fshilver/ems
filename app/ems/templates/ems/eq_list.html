@@ -6,7 +6,7 @@
 
 
 {% block top_right_button %}
-    <div class="col-sm-10">
+    <div class="col-sm-6">
         <div id="eq-status-input-group" class="input-group" style="display: none;">
             <span class="input-group-btn"><button id="eq-status-change-btn" class="btn btn-success">상태 변경</button></span>
             <select id="eq-status" class="form-control">
@@ -15,6 +15,12 @@
                 {% endfor %}
             </select>
         </div>
+    </div>
+    <div class="col-sm-2">
+        <button id="table-btn-checkout" class="btn btn-success btn-block" style="display: none;">반출</button>
+    </div>
+    <div class="col-sm-2">
+        <button id="table-btn-checkin" class="btn btn-success btn-block" style="display: none;">반납</button>
     </div>
     <div class="col-sm-2">
         <button id="table-btn-create" class="btn btn-success btn-block">추가</button>
@@ -152,6 +158,12 @@ $(document).ready(function() {
         if ($('#eq-status-input-group').is(":hidden")) {
             $('#eq-status-input-group').show();
         }
+        if ($('#table-btn-checkout').is(":hidden")) {
+            $('#table-btn-checkout').show();
+        }
+        if ($('#table-btn-checkin').is(":hidden")) {
+            $('#table-btn-checkin').show();
+        }
     });
 
     // row 가 하나도 선택되지 않을 경우 btn hide
@@ -159,6 +171,8 @@ $(document).ready(function() {
         var rows = table.rows( { selected: true } ).count();
         if (rows < 1) {
             $('#eq-status-input-group').hide();
+            $('#table-btn-checkout').hide();
+            $('#table-btn-checkin').hide();
         }
     });
 
@@ -274,7 +288,6 @@ $(document).ready(function() {
                 $('#form-modal form').html(html);
             } else {
                 table.ajax.reload();
-                alert(html);
                 $('#form-modal').modal('hide');
             }
         })
@@ -301,6 +314,69 @@ $(document).ready(function() {
             });
     });
 
+    // 반출 modal form
+    $('#table-btn-checkout').on('click', function() {
+        var eq_list = [];
+        var is_valid = true;
+        $.each(table.rows('.selected').data(), function(index, element) {
+            if ( element.status != '사용 가능') {
+                alert("선택된 장비 중 '사용 가능' 상태가 아닌 장비가 있습니다.");
+                is_valid = false;
+                return;
+            }
+            eq_list.push(element.id);
+        });
+
+        if ( is_valid == false ) {
+            return;
+        }
+        var url = "{% url 'ems:checkout_eq' %}?equipment_list=" + eq_list;
+        var modal_submit_url = "{% url 'ems:checkout_eq' %}";
+
+        $.get(url)
+            .done(function(resp) {
+                var $modal = $('#form-modal');
+                $modal.find('#modal-title-id').html("사용 신청");
+                $modal.find('.modal-content').html(resp);
+                $modal.find('form').attr('action', modal_submit_url);
+                $modal.modal();
+            })
+            .fail(function() {
+                alert("request failed");
+            });
+    });
+
+    // 반납 modal form
+    $('#table-btn-checkin').on('click', function() {
+        var eq_list = [];
+        var is_valid = true;
+        $.each(table.rows('.selected').data(), function(index, element) {
+            if ( element.status != '사용 중') {
+                alert("선택된 장비 중 '사용 중' 상태가 아닌 장비가 있습니다.");
+                is_valid = false;
+                return;
+            }
+            eq_list.push(element.id);
+        });
+
+        if ( is_valid == false ) {
+            return;
+        }
+        var url = "{% url 'ems:checkin_eq' %}?equipment_list=" + eq_list;
+        var modal_submit_url = "{% url 'ems:checkin_eq' %}";
+
+        $.get(url)
+            .done(function(resp) {
+                var $modal = $('#form-modal');
+                $modal.find('#modal-title-id').html("사용 신청");
+                $modal.find('.modal-content').html(resp);
+                $modal.find('form').attr('action', modal_submit_url);
+                $modal.modal();
+            })
+            .fail(function() {
+                alert("request failed");
+            });
+    });
 
 
 });

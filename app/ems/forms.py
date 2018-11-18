@@ -203,3 +203,26 @@ class EquipmentRejectReturnForm(forms.ModelForm):
         widgets = {
             'reject_reason': forms.Textarea(attrs={'class': 'form-control'}),
         }
+
+
+class EquipmentCheckOutForm(forms.ModelForm):
+    """
+    장비 사용 신청 폼
+    """
+    equipment_list = forms.CharField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = EquipmentApply
+        exclude = ('equipment', 'reject_reason', 'status')
+        widgets = {
+            'purpose': forms.Textarea(attrs={'class': 'form-control'}),
+            'check_in_duedate': forms.DateInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': '입력 포맷 (2018-10-01)',
+                },
+                format='%Y-%m-%d',
+            ),
+            'note': forms.Textarea(attrs={'class': 'form-control'}),
+            'user': forms.Select(attrs={'class': 'form-control'})
+        }
