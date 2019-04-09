@@ -28,7 +28,7 @@ def get_user_by_name(name):
         exit()
 
 
-with open('주요사양.csv', encoding='euc-kr') as f:
+with open('spec.csv', encoding='euc-kr') as f:
     lines = csv.reader(f)
     next(lines)
 

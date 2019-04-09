@@ -13,7 +13,7 @@ User = get_user_model()
 from ems.models import Equipment, EquipmentType
 
 kind_set = set()
-with open('장비목록.csv', encoding='euc-kr') as f:
+with open('eq_list.csv', encoding='euc-kr') as f:
     lines = csv.reader(f)
     next(lines)
 

@@ -5,7 +5,7 @@ import datetime
 
 admin_name = '캐스트이즈'
 
-# '장비목록.csv'-'현사용자' column
+# 'eq_list.csv'-'현사용자' column
 change_map_for_current_user = {
     'FD': admin_name,
     'KT': '구자윤B',
@@ -18,7 +18,7 @@ change_map_for_current_user = {
     '구자윤': '구자윤A',
 }
 
-# '장비목록.csv'-'구입요청자' column
+# 'eq_list.csv'-'구입요청자' column
 change_map_for_purchase_requester = {
     'AD. 김대기': '김대기',
     'AD이차원': '이차원',
@@ -62,7 +62,7 @@ change_map_for_purchase_requester = {
     '양경모': '양경모A', # 동일한 이름은 A 로 통일
 }
 
-# '장비목록.csv'-'구매담당자' column
+# 'eq_list.csv'-'구매담당자' column
 change_map_for_purchase_manager = {
     'M. 조용장': '조용장',
     'M.조용장': '조용장',
@@ -74,7 +74,7 @@ change_map_for_purchase_manager = {
 }
 
 
-# '고장수리이력.csv'-'담당' column
+# 'repair_history.csv'-'담당' column
 change_map_for_repair_history = {
     'SN김정훈': '김정훈',
     'AD이하나': '이하나',
@@ -82,7 +82,7 @@ change_map_for_repair_history = {
     '손망실보고서': admin_name,
 }
 
-# '사용자이력.csv'-'사용자' column
+# 'user_history.csv'-'사용자' column
 change_map_for_user_history = {
     '12명': admin_name,
     '경영전략실': admin_name,

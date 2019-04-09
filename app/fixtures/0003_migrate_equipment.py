@@ -108,7 +108,7 @@ def get_price(text):
         return int(text.replace(',',''))
 
 
-with open('장비목록.csv', encoding='euc-kr') as f:
+with open('eq_list.csv', encoding='euc-kr') as f:
     # 0	사번
     # 1	관리번호
     # 2	용도

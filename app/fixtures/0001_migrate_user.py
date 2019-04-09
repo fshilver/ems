@@ -16,7 +16,7 @@ user_name_set = set()
 
 
 # 현재 사용자
-with open('장비목록.csv', encoding='euc-kr') as f:
+with open('eq_list.csv', encoding='euc-kr') as f:
     lines = csv.reader(f)
     next(lines) # skip first line
 
@@ -25,7 +25,7 @@ with open('장비목록.csv', encoding='euc-kr') as f:
         user_name_set.add(clean_user_name(line[14])) # '구입요청자'
         user_name_set.add(clean_user_name(line[15])) # '구입담당자'
 
-with open('사용자이력.csv', encoding='euc-kr') as f:
+with open('user_history.csv', encoding='euc-kr') as f:
     lines = csv.reader(f)
     next(lines)
 

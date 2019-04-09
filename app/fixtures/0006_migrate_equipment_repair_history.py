@@ -32,7 +32,7 @@ def get_user_by_name(name):
         return None
 
 
-with open('고장수리이력.csv', encoding='euc-kr') as f:
+with open('repair_history.csv', encoding='euc-kr') as f:
     lines = csv.reader(f)
     next(lines)
 
