@@ -137,3 +137,51 @@ MYSQL_ROOT_PASSWORD=castis # db root 계정 비밀번호 설정
 
 > - mysql DB 접속
 >   - HeidiSQL 같은 client 프로그램으로 서버주소:3306 으로 접속가능
+
+## 재설치
+
+재설치 시 이전에 생성했던 docker container 와 volume 이 남아있을 수 있다. 이 또한 삭제 후 설치 과정을 진행해야 깨끗하게 재설치 할 수 있다.
+
+1. docker container 중지 및 삭제
+
+```sh
+# 현재 구동중인 docker container 확인
+~$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                          PORTS               NAMES
+87e75f760798        mariadb:10.3.9      "docker-entrypoint.s…"   3 days ago          Restarting (1) 15 seconds ago                       ems-db
+
+# docker container 중지, 위 명령 출력결과에 나와있는 Names 값을 입력하거나 CONTAINER ID 사용
+~$ docker stop ems-db # 또는 docker stop 87e75f760798
+
+
+# -a 옵션 사용시 구동이 중지되었지만 남아있는 docker container 모두 출력
+~$ docker ps -a
+CONTAINER ID        IMAGE                   COMMAND                  CREATED             STATUS                          PORTS                    NAMES
+bc603b0b87e0        fshilver/ems-app:0.1    "supervisord -n"         3 days ago          Exited (137) 20 hours ago                                ems-app
+87e75f760798        mariadb:10.3.9          "docker-entrypoint.s…"   3 days ago          Restarting (1) 24 seconds ago                            ems-db
+
+# docker container 삭제
+~$ docker rm ems-app ems-db
+
+# 삭제되었는지 확인
+~$ docker ps -a
+```
+
+2. docker volume 삭제
+
+ems-db container 가 사용했던 docker volume 삭제
+
+```sh
+# 생성되어 있는 docker volume 확인
+~$ docker volume ls
+DRIVER              VOLUME NAME
+local               ems_ems-db-data
+
+# docker volume 삭제
+~$ docker volume rm ems_ems-db-data
+
+# 삭제되었는지 확인
+~$ docker volume ls
+```
+
+3. `설치방법` 의 `3번` 과정부터 다시 진행하여 재설치
